@@ -48,11 +48,6 @@
         <span>墙壁 {{ store.state.obstacles.length }}</span>
         <span>已解锁 {{ store.state.maxUnlockedLevel }}/5</span>
       </div>
-
-      <div class="rules-box">
-        <strong>规则：</strong>
-        <span>{{ store.state.levelConfig?.rules || '按正确顺序吃掉代码节点；吃错扣生命并增长蛇身。使用方向键或 WASD 控制。' }}</span>
-      </div>
     </section>
 
     <section class="code-section">
@@ -265,20 +260,6 @@ function escapeHtml(text: string): string {
 .progress-item.current {
   color: var(--accent-variable);
   box-shadow: 0 0 0 1px var(--accent-variable);
-}
-
-.rules-box {
-  padding: 8px 10px;
-  background-color: var(--rules-bg);
-  border-left: 4px solid var(--rules-accent);
-  color: var(--text-primary);
-  font-size: 13px;
-  border-radius: 6px;
-}
-
-.rules-box strong {
-  margin-right: 6px;
-  color: var(--rules-accent);
 }
 
 .section-title {
