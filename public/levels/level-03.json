@@ -20,7 +20,15 @@
   "distractors": [
     "if",
     "return",
-    "i>5"
+    "i>5",
+    "while",
+    "i--",
+    "const",
+    "break",
+    "continue",
+    "log(x)",
+    "i<=0",
+    "each"
   ],
   "explanation": "for 循环由初始化、条件判断、步进语句和循环体组成。初始化只在循环开始时执行一次；每次迭代先判断条件，条件为真时执行循环体，然后执行步进语句。"
 }

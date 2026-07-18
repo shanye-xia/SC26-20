@@ -24,7 +24,15 @@
     "finally",
     "throw",
     "error",
-    "stop"
+    "stop",
+    "try()",
+    "return",
+    "console",
+    "warn",
+    "reject",
+    "catch()",
+    "message",
+    "debug"
   ],
   "explanation": "try/catch 用于捕获运行时错误，catch 块中可以集中处理异常。"
 }

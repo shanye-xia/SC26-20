@@ -19,7 +19,14 @@
   "distractors": [
     "var",
     "const",
-    ":"
+    ":",
+    "==",
+    "=>",
+    "null",
+    "return",
+    "value",
+    "++",
+    "num"
   ],
   "explanation": "使用 let 声明变量 score，并赋值为 0。变量赋值的基本结构是：关键字 + 变量名 + 赋值运算符 + 值。"
 }

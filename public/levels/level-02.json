@@ -20,7 +20,15 @@
   "distractors": [
     "else",
     "for",
-    "score<10"
+    "score<10",
+    "while",
+    "return",
+    "break",
+    "true",
+    "false",
+    "==",
+    "&&",
+    "||"
   ],
   "explanation": "if 语句用于条件判断：if (条件) { 执行语句 }。当 score 大于 10 时，调用 win() 函数。"
 }

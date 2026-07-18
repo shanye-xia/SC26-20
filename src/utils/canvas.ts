@@ -135,16 +135,17 @@ export function drawNode(
   }
 
   ctx.fillStyle = isDistractor ? COLORS.textPrimary : COLORS.bgPrimary
-  ctx.font = `${Math.max(10, cellSize * 0.4)}px "JetBrains Mono", "Fira Code", monospace`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
   const maxWidth = cellSize - 8
-  const measured = ctx.measureText(label)
-  const displayLabel = measured.width > maxWidth ? truncateText(ctx, label, maxWidth) : label
+  const maxFontSize = Math.max(10, cellSize * 0.4)
+  const minFontSize = Math.max(6, cellSize * 0.18)
+  const fontSize = fitTextFontSize(ctx, label, maxWidth, maxFontSize, minFontSize)
+  ctx.font = `${fontSize}px "JetBrains Mono", "Fira Code", monospace`
 
   ctx.fillText(
-    displayLabel,
+    label,
     x * cellSize + cellSize / 2,
     y * cellSize + cellSize / 2
   )
@@ -210,12 +211,21 @@ function drawDistractorNode(state: CanvasState, x: number, y: number): void {
   ctx.setLineDash([])
 }
 
-function truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
-  let result = text
-  while (result.length > 1 && ctx.measureText(`${result}..`).width > maxWidth) {
-    result = result.slice(0, -1)
+function fitTextFontSize(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxFontSize: number,
+  minFontSize: number
+): number {
+  for (let size = maxFontSize; size >= minFontSize; size -= 1) {
+    ctx.font = `${size}px "JetBrains Mono", "Fira Code", monospace`
+    if (ctx.measureText(text).width <= maxWidth) {
+      return size
+    }
   }
-  return `${result}..`
+
+  return minFontSize
 }
 
 export function drawSnake(

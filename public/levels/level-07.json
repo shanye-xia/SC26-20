@@ -22,7 +22,15 @@
     "{}",
     ".pop",
     "(index)",
-    "array"
+    "array",
+    ".map",
+    ".filter",
+    ".shift",
+    ".length",
+    "return",
+    "items",
+    "Set",
+    "[item]"
   ],
   "explanation": "数组 push 方法会把新元素追加到数组末尾，常用于收集数据。"
 }

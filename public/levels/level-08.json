@@ -23,7 +23,15 @@
     "else",
     "true",
     "break",
-    "item"
+    "item",
+    "throw",
+    "undef",
+    "continue",
+    "&&",
+    "user.id",
+    "return",
+    "render",
+    "try"
   ],
   "explanation": "提前返回可以先处理无效输入，让后续主流程更清晰。"
 }

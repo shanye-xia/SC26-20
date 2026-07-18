@@ -21,7 +21,15 @@
   "distractors": [
     "while",
     "[1,2",
-    "print(x)"
+    "print(x)",
+    "map",
+    "arr[i]",
+    "let",
+    "return",
+    "push",
+    "each",
+    "length",
+    "x++"
   ],
   "explanation": "先定义数组 arr，然后使用 for...of 循环遍历数组中的每个元素 x，并打印出来。"
 }

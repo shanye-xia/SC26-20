@@ -43,6 +43,37 @@ describe('nodes utils', () => {
     expect(isCorrectNode(node, 1)).toBe(false)
   })
 
+  it('should not generate distractors with the current correct label', () => {
+    const snake = createSnake({ x: 5, y: 5 })
+    const level: LevelConfig = {
+      ...mockLevel,
+      distractorCount: 2,
+      correctOrder: ['a'],
+      codeTemplate: '{1}',
+      distractors: ['a', 'x', 'y']
+    }
+    const nodes = generateNodes(snake, level, 0)
+    const distractors = nodes.filter((node) => node.type === 'DISTRACTOR')
+
+    expect(distractors).toHaveLength(2)
+    expect(distractors.every((node) => node.label !== 'a')).toBe(true)
+  })
+
+  it('should not generate duplicate node labels', () => {
+    const snake = createSnake({ x: 5, y: 5 })
+    const level: LevelConfig = {
+      ...mockLevel,
+      distractorCount: 4,
+      correctOrder: ['a'],
+      codeTemplate: '{1}',
+      distractors: ['a', 'x', 'x', 'y', 'z']
+    }
+    const nodes = generateNodes(snake, level, 0)
+    const labels = nodes.map((node) => node.label)
+
+    expect(new Set(labels).size).toBe(labels.length)
+  })
+
   it('should find node at position', () => {
     const nodes: CodeNode[] = [
       {

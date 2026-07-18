@@ -22,7 +22,15 @@
     "let",
     "||",
     "dead",
-    "score<0"
+    "score<0",
+    "false",
+    "true",
+    "!",
+    "??",
+    "===",
+    "return",
+    "bool",
+    "enabled"
   ],
   "explanation": "布尔表达式可以用 && 组合多个条件，只有两侧条件都为真时结果才为真。"
 }

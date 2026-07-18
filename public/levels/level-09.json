@@ -23,7 +23,15 @@
     "sync",
     "return",
     "then",
-    "path"
+    "path",
+    "Promise",
+    "catch",
+    "json",
+    "const",
+    "try",
+    "resp",
+    "timer",
+    "import"
   ],
   "explanation": "async 函数中可以使用 await 等待异步操作完成，再继续执行后续代码。"
 }

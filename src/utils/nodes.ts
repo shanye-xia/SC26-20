@@ -46,14 +46,11 @@ export function generateNodes(
     nodes.push(correctNode)
   }
 
-  const distractorCount = Math.min(
-    levelConfig.distractorCount,
-    levelConfig.distractors.length
-  )
+  const availableDistractors = getAvailableDistractors(levelConfig, correctLabel)
+  const distractorCount = Math.min(levelConfig.distractorCount, availableDistractors.length)
+  const selectedDistractors = pickRandomLabels(availableDistractors, distractorCount)
 
-  for (let i = 0; i < distractorCount; i++) {
-    const label =
-      levelConfig.distractors[Math.floor(Math.random() * levelConfig.distractors.length)]
+  for (const label of selectedDistractors) {
     const distractorNode = createDistractorNode(snake, nodes, label, blockedPositions)
     nodes.push(distractorNode)
   }
@@ -67,4 +64,23 @@ export function getNodeAt(nodes: CodeNode[], position: Position): CodeNode | und
 
 export function isCorrectNode(node: CodeNode, collectedCount: number): boolean {
   return node.type === 'CORRECT' && node.orderIndex === collectedCount
+}
+
+function getAvailableDistractors(levelConfig: LevelConfig, correctLabel?: string): string[] {
+  const uniqueDistractors = Array.from(new Set(levelConfig.distractors))
+  if (correctLabel === undefined) return uniqueDistractors
+  return uniqueDistractors.filter((label) => label !== correctLabel)
+}
+
+function pickRandomLabels(labels: string[], count: number): string[] {
+  const pool = [...labels]
+  const picked: string[] = []
+
+  while (picked.length < count && pool.length > 0) {
+    const index = Math.floor(Math.random() * pool.length)
+    const [label] = pool.splice(index, 1)
+    picked.push(label)
+  }
+
+  return picked
 }

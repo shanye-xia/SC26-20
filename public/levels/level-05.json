@@ -22,7 +22,15 @@
   "distractors": [
     "class",
     "greet",
-    "[]"
+    "[]",
+    "return",
+    "=>",
+    "const",
+    "call",
+    "new",
+    "this",
+    "async",
+    "await"
   ],
   "explanation": "函数定义使用 function 关键字，后跟函数名、参数列表和函数体。这里定义了 greet 函数，函数体中调用 hello()。"
 }
