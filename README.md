@@ -4,6 +4,50 @@
 
 一款面向编程初学者的教育向网页游戏：保留传统贪吃蛇操作，但地图中不再刷新普通食物，而是随机出现**代码节点**。玩家必须按照正确程序结构依次吃掉节点，右侧代码面板会随进度逐步点亮，最终在”玩”的过程中理解代码执行顺序。Demo 阶段使用 **Canvas 2D** 渲染游戏区，结合 Vue 3 + Pinia 管理状态。Demo 阶段使用 **Canvas 2D** 渲染游戏区，结合 Vue 3 + Pinia 管理状态。
 
+## Quick Start
+
+环境要求：
+
+- Node.js 18+，建议 Node.js 20 或 22
+- npm 9+
+- Git
+- 现代桌面浏览器，建议 Chrome / Edge
+- 游戏依赖键盘操作，当前不面向移动端触屏优化
+
+从 0 开始运行：
+
+```bash
+git clone git@github.com:shanye-xia/SC26-20.git
+cd SC26-20
+npm install
+npm run dev
+```
+
+如果没有配置 GitHub SSH key，可以使用 HTTPS 拉取：
+
+```bash
+git clone https://github.com/shanye-xia/SC26-20.git
+```
+
+浏览器打开终端输出的本地地址，通常是 `http://localhost:5173/`。
+
+常用命令：
+
+```bash
+npm run test       # 运行单元测试
+npm run build      # 类型检查并构建生产包
+npm run preview    # 预览构建结果
+```
+
+Windows PowerShell 如果拦截 `npm.ps1`，可以改用：
+
+```bash
+npm.cmd install
+npm.cmd run dev
+npm.cmd run test
+npm.cmd run build
+```
+
 ---
 
 ## 目录
@@ -511,27 +555,3 @@ App.vue
 > **如何让代码节点足够短、容易识别，同时保证正确顺序不会产生歧义。**
 
 因此 Demo 最好先使用“代码关键词和语句块”，不要把单个括号、分号拆成独立节点。这样既能降低实现难度，也更像真正的贪吃蛇游戏，课程展示可行性较高。
-
-## 快速启动
-
-本项目基于 Vite + Vue 3。首次运行先安装依赖：
-
-```bash
-npm install
-```
-
-启动本地开发环境：
-
-```bash
-npm run dev
-```
-
-浏览器打开终端输出的本地地址，通常是 `http://localhost:5173/`。
-
-常用命令：
-
-```bash
-npm run build      # 类型检查并构建生产包
-npm run preview    # 预览构建结果
-npm run test       # 运行单元测试
-```
