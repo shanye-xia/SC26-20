@@ -24,12 +24,13 @@
       <div class="progress-card">
         <div class="progress-header">
           <span>当前关卡进度</span>
-          <strong>{{ store.state.collectedCount }}/{{ totalTargets }}</strong>
+          <strong>下一个：{{ store.currentTargetLabel || '完成' }}</strong>
         </div>
-        <div class="progress-track" aria-label="当前关卡进度">
-          <div class="progress-fill" :style="{ width: `${progressPercent}%` }" />
-        </div>
-        <div class="progress-steps">
+        <div
+          class="progress-steps"
+          :style="progressGridStyle"
+          aria-label="当前关卡进度"
+        >
           <span
             v-for="(item, index) in progressItems"
             :key="index"
@@ -74,15 +75,14 @@ const store = useGameStore()
 
 const totalTargets = computed(() => store.state.levelConfig?.correctOrder.length ?? 0)
 
-const progressPercent = computed(() => {
-  if (totalTargets.value === 0) return 0
-  return Math.round((store.state.collectedCount / totalTargets.value) * 100)
-})
+const progressGridStyle = computed(() => ({
+  gridTemplateColumns: `repeat(${Math.max(totalTargets.value, 1)}, minmax(0, 1fr))`
+}))
 
 const progressItems = computed(() => {
   const order = store.state.levelConfig?.correctOrder ?? []
   return order.map((item, index) => {
-    if (index < store.state.collectedCount) return item
+    if (index <= store.state.collectedCount) return item
     return '?'
   })
 })
@@ -219,36 +219,32 @@ function escapeHtml(text: string): string {
   font-family: "JetBrains Mono", "Fira Code", monospace;
 }
 
-.progress-track {
-  height: 10px;
-  overflow: hidden;
-  border-radius: 999px;
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border);
-}
-
-.progress-fill {
-  height: 100%;
-  min-width: 0;
-  border-radius: inherit;
-  background-color: var(--accent-string);
-  transition: width 0.25s ease;
-}
-
 .progress-steps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
 }
 
 .progress-item {
-  padding: 2px 8px;
-  border-radius: 4px;
+  min-width: 0;
+  min-height: 30px;
+  padding: 5px 6px;
   font-family: "JetBrains Mono", "Fira Code", monospace;
   background-color: var(--bg-primary);
   color: var(--text-secondary);
   font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-right: 1px solid var(--border);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.progress-item:last-child {
+  border-right: 0;
 }
 
 .progress-item.lit {
@@ -258,8 +254,10 @@ function escapeHtml(text: string): string {
 }
 
 .progress-item.current {
+  background-color: rgba(249, 226, 175, 0.16);
   color: var(--accent-variable);
-  box-shadow: 0 0 0 1px var(--accent-variable);
+  box-shadow: inset 0 0 0 1px var(--accent-variable);
+  font-weight: 700;
 }
 
 .section-title {
