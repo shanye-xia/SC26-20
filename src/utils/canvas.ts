@@ -204,9 +204,12 @@ export function drawProjectile(state: CanvasState, x: number, y: number): void {
   const cy = y * cellSize + cellSize / 2
 
   ctx.fillStyle = COLORS.projectile
+  ctx.strokeStyle = COLORS.powerShot
+  ctx.lineWidth = 2
   ctx.beginPath()
-  ctx.arc(cx, cy, Math.max(3, cellSize * 0.16), 0, Math.PI * 2)
+  ctx.arc(cx, cy, Math.max(4, cellSize * 0.2), 0, Math.PI * 2)
   ctx.fill()
+  ctx.stroke()
 }
 
 function drawCorrectNode(state: CanvasState, x: number, y: number, isCurrentTarget: boolean): void {
@@ -275,7 +278,7 @@ export function drawSnake(
     drawSnakeEffect(state, segment.x, segment.y, effects)
 
     if (isHead) {
-      drawEyes(state, segment.x, segment.y, headDirection)
+      drawEyes(state, segment.x, segment.y, headDirection, (effects?.shots ?? 0) > 0)
     }
   })
 }
@@ -293,15 +296,24 @@ function drawSnakeEffect(
   const py = y * cellSize + 1
   const size = cellSize - 2
 
-  ctx.lineWidth = effects.invincibleMs > 0 ? 3 : 2
-  ctx.strokeStyle =
+  const primaryColor =
     effects.invincibleMs > 0
       ? COLORS.powerInvincible
-      : effects.shield > 0
-        ? COLORS.powerShield
-        : COLORS.powerShot
+      : effects.shots > 0
+        ? COLORS.powerShot
+        : COLORS.powerShield
+
+  ctx.lineWidth = effects.invincibleMs > 0 ? 4 : effects.shots > 0 ? 3 : 2
+  ctx.strokeStyle = primaryColor
   roundRect(ctx, px, py, size, size, 6)
   ctx.stroke()
+
+  if (effects.shield > 0 && effects.invincibleMs <= 0 && effects.shots > 0) {
+    ctx.lineWidth = 1
+    ctx.strokeStyle = COLORS.powerShield
+    roundRect(ctx, px + 3, py + 3, size - 6, size - 6, 4)
+    ctx.stroke()
+  }
 }
 
 function getPowerUpColor(type: PowerUpType): string {
@@ -330,7 +342,8 @@ function drawEyes(
   state: CanvasState,
   x: number,
   y: number,
-  direction: string
+  direction: string,
+  armed: boolean
 ): void {
   const { ctx, cellSize } = state
   const cx = x * cellSize + cellSize / 2
@@ -338,7 +351,7 @@ function drawEyes(
   const eyeRadius = Math.max(2, cellSize * 0.12)
   const offset = cellSize * 0.18
 
-  ctx.fillStyle = COLORS.bgPrimary
+  ctx.fillStyle = armed ? COLORS.armedEye : COLORS.bgPrimary
 
   const eyePositions = getEyePositions(direction, cx, cy, offset)
   for (const eye of eyePositions) {

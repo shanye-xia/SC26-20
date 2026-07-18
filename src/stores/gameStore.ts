@@ -394,18 +394,29 @@ export const useGameStore = defineStore('game', () => {
 
     for (const projectile of state.projectiles) {
       const vector = DIRECTION_VECTORS[projectile.direction]
-      const nextPosition = {
-        x: projectile.position.x + vector.x,
-        y: projectile.position.y + vector.y
+      let nextPosition = projectile.position
+      let hit = false
+
+      for (let step = 0; step < GAME_CONSTANTS.projectileStepsPerTick; step++) {
+        nextPosition = {
+          x: nextPosition.x + vector.x,
+          y: nextPosition.y + vector.y
+        }
+
+        if (isOutOfBounds(nextPosition)) {
+          hit = true
+          break
+        }
+
+        const obstacleIndex = state.obstacles.findIndex((obstacle) => positionsEqual(obstacle, nextPosition))
+        if (obstacleIndex >= 0) {
+          state.obstacles.splice(obstacleIndex, 1)
+          hit = true
+          break
+        }
       }
 
-      if (isOutOfBounds(nextPosition)) continue
-
-      const obstacleIndex = state.obstacles.findIndex((obstacle) => positionsEqual(obstacle, nextPosition))
-      if (obstacleIndex >= 0) {
-        state.obstacles.splice(obstacleIndex, 1)
-        continue
-      }
+      if (hit) continue
 
       nextProjectiles.push({
         ...projectile,
