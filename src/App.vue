@@ -9,6 +9,7 @@
       </div>
 
       <StatusBar class="status-bar" />
+      <DebugPanel v-if="isDev" />
       <LevelModal />
     </div>
   </n-config-provider>
@@ -23,10 +24,12 @@ import HUD from '@/components/HUD.vue'
 import GameBoard from '@/components/GameBoard.vue'
 import CodePanel from '@/components/CodePanel.vue'
 import StatusBar from '@/components/StatusBar.vue'
+import DebugPanel from '@/components/DebugPanel.vue'
 import LevelModal from '@/components/LevelModal.vue'
 
 const store = useGameStore()
 useInput()
+const isDev = import.meta.env.DEV
 
 const themeOverrides = {
   common: {

@@ -12,6 +12,7 @@ import type {
   GameState,
   LevelConfig,
   PowerUp,
+  PowerUpType,
   Position,
   Projectile,
   TickResult
@@ -108,6 +109,7 @@ export const useGameStore = defineStore('game', () => {
     state.score = 0
     state.snake = createSnake(CENTER, levelConfig.initialSnakeLength ?? GAME_CONSTANTS.initialSnakeLength)
     state.obstacles = generateObstacles(state.snake, levelConfig.obstacleCount ?? 0)
+    state.nodes = []
     state.powerUps = generatePowerUps(levelConfig, state.snake, state.obstacles)
     state.projectiles = []
     state.activeEffects = { shield: 0, invincibleMs: 0, shots: 0 }
@@ -321,6 +323,58 @@ export const useGameStore = defineStore('game', () => {
     state.hardMode = enabled
   }
 
+  async function debugStartLevel(levelIndex: number): Promise<void> {
+    const targetLevel = Math.min(Math.max(1, levelIndex), GAME_CONSTANTS.maxLevel)
+    state.maxUnlockedLevel = Math.max(state.maxUnlockedLevel, targetLevel)
+    await startLevel(targetLevel)
+  }
+
+  function debugUnlockAllLevels(): void {
+    state.maxUnlockedLevel = GAME_CONSTANTS.maxLevel
+  }
+
+  function debugSetUnlockedLevel(levelIndex: number): void {
+    state.maxUnlockedLevel = Math.min(Math.max(1, levelIndex), GAME_CONSTANTS.maxLevel)
+  }
+
+  function debugGrantPowerUp(type: PowerUpType): void {
+    switch (type) {
+      case 'SHIELD':
+        state.activeEffects.shield += 1
+        break
+      case 'INVINCIBLE':
+        state.activeEffects.invincibleMs = GAME_CONSTANTS.invincibleDurationMs
+        break
+      case 'SHOT':
+        state.activeEffects.shots += GAME_CONSTANTS.shotCharges
+        break
+    }
+  }
+
+  function debugSpawnPowerUp(type: PowerUpType): void {
+    state.powerUps.push({
+      id: nanoid(),
+      type,
+      position: getRandomEmptyPosition(
+        state.snake,
+        [...state.nodes, ...state.powerUps.map((powerUp) => ({ position: powerUp.position }))],
+        state.obstacles
+      )
+    })
+  }
+
+  function debugClearPowerUps(): void {
+    state.powerUps = []
+  }
+
+  function debugSetEffects(shield: number, invincibleMs: number, shots: number): void {
+    state.activeEffects = {
+      shield: Math.max(0, shield),
+      invincibleMs: Math.max(0, invincibleMs),
+      shots: Math.max(0, shots)
+    }
+  }
+
   function fireShot(): void {
     if (state.status === 'PAUSED') {
       state.status = 'PLAYING'
@@ -433,6 +487,13 @@ export const useGameStore = defineStore('game', () => {
     nextLevel,
     selectLevel,
     setHardMode,
+    debugStartLevel,
+    debugUnlockAllLevels,
+    debugSetUnlockedLevel,
+    debugGrantPowerUp,
+    debugSpawnPowerUp,
+    debugClearPowerUps,
+    debugSetEffects,
     fireShot,
     resetGame,
     renderCanvas
