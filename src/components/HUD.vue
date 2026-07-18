@@ -1,20 +1,16 @@
 <template>
   <n-card class="hud" size="small">
     <div class="hud-content">
-      <div class="progress">
-        <span class="progress-label">进度：</span>
-        <span
-          v-for="(item, index) in progressItems"
-          :key="index"
-          class="progress-item"
-          :class="{ lit: index < store.state.collectedCount, current: index === store.state.collectedCount }"
-        >
-          {{ item }}
-        </span>
+      <div class="brand">
+        <h1>Code Snake</h1>
+        <span>方向键 / WASD 控制</span>
       </div>
 
-      <div v-if="store.state.status === 'PAUSED'" class="start-hint">
-        按方向键或 WASD 开始游戏
+      <div class="general-info">
+        <span>关卡 {{ store.state.levelIndex }}</span>
+        <span>已解锁 {{ store.state.maxUnlockedLevel }}/5</span>
+        <span>得分 {{ store.state.score }}</span>
+        <span>{{ statusLabel }}</span>
       </div>
     </div>
   </n-card>
@@ -27,12 +23,21 @@ import { useGameStore } from '@/stores/gameStore'
 
 const store = useGameStore()
 
-const progressItems = computed(() => {
-  const order = store.state.levelConfig?.correctOrder ?? []
-  return order.map((item, index) => {
-    if (index < store.state.collectedCount) return item
-    return '?'
-  })
+const statusLabel = computed(() => {
+  switch (store.state.status) {
+    case 'PLAYING':
+      return '进行中'
+    case 'PAUSED':
+      return '等待开始'
+    case 'LEVEL_PASSED':
+      return '关卡完成'
+    case 'LEVEL_FAILED':
+      return '关卡失败'
+    case 'ALL_LEVELS_CLEARED':
+      return '全部通关'
+    default:
+      return '准备中'
+  }
 })
 </script>
 
@@ -44,49 +49,41 @@ const progressItems = computed(() => {
 
 .hud-content {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.brand span,
+.general-info span {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.general-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
-.progress {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.progress-label {
-  color: var(--text-secondary);
-}
-
-.progress-item {
-  padding: 2px 8px;
+.general-info span {
+  padding: 3px 8px;
   border-radius: 4px;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
   background-color: var(--bg-code);
-  color: var(--text-secondary);
-  transition: all 0.3s ease;
-}
-
-.progress-item.lit {
-  color: #000000 !important;
-  background-color: var(--progress-lit-bg) !important;
-  font-weight: 700;
-}
-
-.progress-item.current {
-  color: var(--accent-variable);
-  box-shadow: 0 0 0 1px var(--accent-variable);
-}
-
-.start-hint {
-  font-size: 13px;
-  color: var(--accent-variable);
-  padding: 6px 10px;
-  background-color: rgba(249, 226, 175, 0.1);
-  border-radius: 4px;
-  text-align: center;
 }
 
 </style>

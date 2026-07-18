@@ -1,9 +1,7 @@
 <template>
   <n-card class="code-panel" title="关卡信息" size="small">
     <section class="level-section">
-      <h2 class="level-title">{{ store.state.levelConfig?.title || 'Code Snake' }}</h2>
-      <p class="level-description">{{ store.state.levelConfig?.description || '按正确顺序吃掉代码节点' }}</p>
-
+      <h3 class="section-title">关卡选择</h3>
       <div class="level-picker" aria-label="关卡选择">
         <n-button
           v-for="item in store.availableLevels"
@@ -16,6 +14,31 @@
         >
           {{ item.level }}
         </n-button>
+      </div>
+    </section>
+
+    <section class="level-section current-level">
+      <h2 class="level-title">{{ store.state.levelConfig?.title || 'Code Snake' }}</h2>
+      <p class="level-description">{{ store.state.levelConfig?.description || '按正确顺序吃掉代码节点' }}</p>
+
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>当前关卡进度</span>
+          <strong>{{ store.state.collectedCount }}/{{ totalTargets }}</strong>
+        </div>
+        <div class="progress-track" aria-label="当前关卡进度">
+          <div class="progress-fill" :style="{ width: `${progressPercent}%` }" />
+        </div>
+        <div class="progress-steps">
+          <span
+            v-for="(item, index) in progressItems"
+            :key="index"
+            class="progress-item"
+            :class="{ lit: index < store.state.collectedCount, current: index === store.state.collectedCount }"
+          >
+            {{ item }}
+          </span>
+        </div>
       </div>
 
       <div class="level-stats">
@@ -53,6 +76,21 @@ import { NButton, NCard } from 'naive-ui'
 import { useGameStore } from '@/stores/gameStore'
 
 const store = useGameStore()
+
+const totalTargets = computed(() => store.state.levelConfig?.correctOrder.length ?? 0)
+
+const progressPercent = computed(() => {
+  if (totalTargets.value === 0) return 0
+  return Math.round((store.state.collectedCount / totalTargets.value) * 100)
+})
+
+const progressItems = computed(() => {
+  const order = store.state.levelConfig?.correctOrder ?? []
+  return order.map((item, index) => {
+    if (index < store.state.collectedCount) return item
+    return '?'
+  })
+})
 
 const renderedCode = computed(() => {
   const config = store.state.levelConfig
@@ -107,6 +145,10 @@ function escapeHtml(text: string): string {
   gap: 10px;
 }
 
+.current-level {
+  margin-top: 16px;
+}
+
 .code-section {
   margin-top: 16px;
 }
@@ -158,6 +200,71 @@ function escapeHtml(text: string): string {
   background-color: var(--bg-code);
   color: var(--text-secondary);
   font-size: 12px;
+}
+
+.progress-card {
+  padding: 10px;
+  background-color: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.progress-header strong {
+  color: var(--accent-variable);
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+.progress-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border);
+}
+
+.progress-fill {
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background-color: var(--accent-string);
+  transition: width 0.25s ease;
+}
+
+.progress-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.progress-item {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.progress-item.lit {
+  color: #000000;
+  background-color: var(--progress-lit-bg);
+  font-weight: 700;
+}
+
+.progress-item.current {
+  color: var(--accent-variable);
+  box-shadow: 0 0 0 1px var(--accent-variable);
 }
 
 .rules-box {
