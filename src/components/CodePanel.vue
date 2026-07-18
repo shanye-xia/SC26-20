@@ -57,6 +57,17 @@
         <span>墙壁 {{ store.state.obstacles.length }}</span>
         <span>已解锁 {{ store.state.maxUnlockedLevel }}/{{ store.availableLevels.length }}</span>
       </div>
+
+      <div class="mode-row">
+        <div>
+          <strong>困难模式</strong>
+          <span>正确节点不再额外标记</span>
+        </div>
+        <n-switch
+          :value="store.state.hardMode"
+          @update:value="store.setHardMode"
+        />
+      </div>
     </section>
 
     <section class="code-section">
@@ -76,7 +87,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { NButton, NCard } from 'naive-ui'
+import { NButton, NCard, NSwitch } from 'naive-ui'
 import { useGameStore } from '@/stores/gameStore'
 
 const store = useGameStore()
@@ -231,6 +242,33 @@ function escapeHtml(text: string): string {
   border: 1px solid var(--border);
   border-radius: 4px;
   background-color: var(--bg-code);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.mode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--bg-code);
+}
+
+.mode-row div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mode-row strong {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.mode-row span {
   color: var(--text-secondary);
   font-size: 12px;
 }

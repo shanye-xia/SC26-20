@@ -50,7 +50,8 @@ function createInitialState(): GameState {
     collectedCount: 0,
     speed: 200,
     growCounter: 0,
-    errorFlash: false
+    errorFlash: false,
+    hardMode: false
   }
 }
 
@@ -245,8 +246,8 @@ export const useGameStore = defineStore('game', () => {
         node.position.x,
         node.position.y,
         node.label,
-        node.type === 'CORRECT' && node.orderIndex === state.collectedCount,
-        node.type === 'DISTRACTOR'
+        !state.hardMode && node.type === 'CORRECT' && node.orderIndex === state.collectedCount,
+        state.hardMode || node.type === 'DISTRACTOR'
       )
     })
 
@@ -266,6 +267,10 @@ export const useGameStore = defineStore('game', () => {
     return updatedParticles
   }
 
+  function setHardMode(enabled: boolean): void {
+    state.hardMode = enabled
+  }
+
   return {
     state,
     currentTargetLabel,
@@ -280,6 +285,7 @@ export const useGameStore = defineStore('game', () => {
     retryLevel,
     nextLevel,
     selectLevel,
+    setHardMode,
     resetGame,
     renderCanvas
   }

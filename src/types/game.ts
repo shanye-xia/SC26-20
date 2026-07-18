@@ -63,6 +63,7 @@ export interface GameState {
   speed: number
   growCounter: number
   errorFlash: boolean
+  hardMode: boolean
 }
 
 export interface TickResult {
