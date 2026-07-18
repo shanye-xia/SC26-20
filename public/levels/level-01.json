@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "type": "order",
+  "title": "变量赋值",
+  "description": "按正确顺序吃掉变量赋值的代码节点。",
+  "speed": 250,
+  "lives": 3,
+  "distractorCount": 2,
+  "correctOrder": [
+    "let",
+    "score",
+    "=",
+    "0"
+  ],
+  "codeTemplate": "{1} {2} {3} {4};",
+  "distractors": [
+    "var",
+    "const",
+    ":"
+  ],
+  "explanation": "使用 let 声明变量 score，并赋值为 0。变量赋值的基本结构是：关键字 + 变量名 + 赋值运算符 + 值。"
+}

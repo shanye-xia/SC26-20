@@ -1,0 +1,23 @@
+{
+  "id": 4,
+  "type": "order",
+  "title": "数组遍历",
+  "description": "按正确顺序吃掉遍历数组的代码节点。",
+  "speed": 180,
+  "lives": 3,
+  "distractorCount": 3,
+  "correctOrder": [
+    "let arr",
+    "=",
+    "[1,2,3]",
+    "for",
+    "log(x)"
+  ],
+  "codeTemplate": "{1} {2} {3};\n{4} (let x of arr) {\n  {5};\n}",
+  "distractors": [
+    "while",
+    "[1,2",
+    "print(x)"
+  ],
+  "explanation": "先定义数组 arr，然后使用 for...of 循环遍历数组中的每个元素 x，并打印出来。"
+}

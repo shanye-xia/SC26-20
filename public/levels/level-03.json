@@ -1,0 +1,23 @@
+{
+  "id": 3,
+  "type": "order",
+  "title": "补全 for 循环",
+  "description": "按照正确的 for 循环结构依次吃掉代码节点。",
+  "speed": 200,
+  "lives": 3,
+  "distractorCount": 3,
+  "correctOrder": [
+    "for",
+    "let i=0",
+    "i<5",
+    "i++",
+    "log(i)"
+  ],
+  "codeTemplate": "{1} ({2}; {3}; {4}) {\n  {5};\n}",
+  "distractors": [
+    "if",
+    "return",
+    "i>5"
+  ],
+  "explanation": "for 循环由初始化、条件判断、步进语句和循环体组成。初始化只在循环开始时执行一次；每次迭代先判断条件，条件为真时执行循环体，然后执行步进语句。"
+}

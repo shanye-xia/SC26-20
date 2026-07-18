@@ -1,0 +1,23 @@
+{
+  "id": 5,
+  "type": "order",
+  "title": "简单函数调用",
+  "description": "按正确顺序吃掉定义和调用函数的代码节点。",
+  "speed": 150,
+  "lives": 3,
+  "distractorCount": 3,
+  "correctOrder": [
+    "function",
+    "greet",
+    "()",
+    "{",
+    "hello()"
+  ],
+  "codeTemplate": "{1} {2}{3} {4}\n  {5};\n}",
+  "distractors": [
+    "class",
+    "greet",
+    "[]"
+  ],
+  "explanation": "函数定义使用 function 关键字，后跟函数名、参数列表和函数体。这里定义了 greet 函数，函数体中调用 hello()。"
+}

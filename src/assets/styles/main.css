@@ -1,0 +1,57 @@
+:root {
+  --bg-primary: #1e1e2e;
+  --bg-panel: #2a2a3c;
+  --bg-code: #1a1b26;
+  --grid-line: #3b3d52;
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --accent-keyword: #f38ba8;
+  --accent-variable: #f9e2af;
+  --accent-string: #a6e3a1;
+  --accent-function: #89b4fa;
+  --accent-error: #f38ba8;
+  --accent-health: #f7768e;
+  --accent-snake: #89dceb;
+  --accent-node: #b4befe;
+  --border: #45475a;
+
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
