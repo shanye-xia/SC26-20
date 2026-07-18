@@ -324,6 +324,8 @@ function getPowerUpColor(type: PowerUpType): string {
       return COLORS.powerInvincible
     case 'SHOT':
       return COLORS.powerShot
+    case 'HEALTH':
+      return COLORS.powerHealth
   }
 }
 
@@ -335,6 +337,8 @@ function getPowerUpLabel(type: PowerUpType): string {
       return '无'
     case 'SHOT':
       return '弹'
+    case 'HEALTH':
+      return '+'
   }
 }
 

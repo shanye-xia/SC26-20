@@ -41,6 +41,7 @@ export const COLORS = {
   powerShield: '#cba6f7',
   powerInvincible: '#f9e2af',
   powerShot: '#fab387',
+  powerHealth: '#f7768e',
   projectile: '#ff6b35',
   armedEye: '#ff3b30',
   border: '#45475a'
@@ -55,7 +56,7 @@ export const GAME_CONSTANTS = {
   wrongGrowth: 2,
   errorFlashDuration: 200,
   invincibleDurationMs: 5000,
-  powerUpSpawnCount: 3,
+  powerUpSpawnCount: 4,
   shotCharges: 3,
   projectileStepsPerTick: 3,
   particleCount: 10,

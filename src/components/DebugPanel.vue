@@ -50,6 +50,9 @@
       <n-button size="small" @click="store.debugGrantPowerUp('SHOT')">
         +弹药
       </n-button>
+      <n-button size="small" @click="store.debugGrantPowerUp('HEALTH')">
+        +生命
+      </n-button>
       <n-button size="small" @click="store.fireShot()">
         发射
       </n-button>
@@ -64,6 +67,9 @@
       </n-button>
       <n-button size="small" @click="store.debugSpawnPowerUp('SHOT')">
         生成攻击
+      </n-button>
+      <n-button size="small" @click="store.debugSpawnPowerUp('HEALTH')">
+        生成生命
       </n-button>
       <n-button size="small" @click="store.debugClearPowerUps()">
         清道具

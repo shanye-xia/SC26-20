@@ -6,7 +6,7 @@ export interface Position {
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
 export type NodeType = 'CORRECT' | 'DISTRACTOR'
-export type PowerUpType = 'SHIELD' | 'INVINCIBLE' | 'SHOT'
+export type PowerUpType = 'SHIELD' | 'INVINCIBLE' | 'SHOT' | 'HEALTH'
 
 export type LevelType = 'order' | 'output' | 'bugfix' | 'matching' | 'flow'
 

@@ -130,6 +130,8 @@ const availablePowerUps = computed(() => {
         return { type, label: '无敌', description: '短时间免疫伤害' }
       case 'SHOT':
         return { type, label: '攻击', description: '按空格击碎墙壁' }
+      case 'HEALTH':
+        return { type, label: '生命', description: '恢复 1 点生命' }
     }
   })
 })

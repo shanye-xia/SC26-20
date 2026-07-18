@@ -348,6 +348,9 @@ export const useGameStore = defineStore('game', () => {
       case 'SHOT':
         state.activeEffects.shots += GAME_CONSTANTS.shotCharges
         break
+      case 'HEALTH':
+        state.lives = Math.min(state.levelConfig?.lives ?? GAME_CONSTANTS.initialLives, state.lives + 1)
+        break
     }
   }
 
@@ -452,6 +455,9 @@ export const useGameStore = defineStore('game', () => {
         break
       case 'SHOT':
         state.activeEffects.shots += GAME_CONSTANTS.shotCharges
+        break
+      case 'HEALTH':
+        state.lives = Math.min(state.levelConfig?.lives ?? GAME_CONSTANTS.initialLives, state.lives + 1)
         break
     }
   }
