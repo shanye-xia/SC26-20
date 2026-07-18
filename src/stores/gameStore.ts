@@ -40,6 +40,7 @@ function createInitialState(): GameState {
   return {
     status: 'IDLE',
     levelIndex: 1,
+    maxUnlockedLevel: 1,
     levelConfig: null,
     lives: GAME_CONSTANTS.initialLives,
     score: 0,
@@ -69,6 +70,17 @@ export const useGameStore = defineStore('game', () => {
   const isGameOver = computed(() => state.status === 'LEVEL_FAILED' || state.status === 'ALL_LEVELS_CLEARED')
 
   const isPaused = computed(() => state.status === 'PAUSED')
+
+  const availableLevels = computed(() => {
+    return Array.from({ length: GAME_CONSTANTS.maxLevel }, (_, index) => {
+      const level = index + 1
+      return {
+        level,
+        unlocked: level <= state.maxUnlockedLevel,
+        current: level === state.levelIndex
+      }
+    })
+  })
 
   function resetState(): void {
     Object.assign(state, createInitialState())
@@ -158,6 +170,10 @@ export const useGameStore = defineStore('game', () => {
         state.levelConfig &&
         state.collectedCount >= state.levelConfig.correctOrder.length
       ) {
+        state.maxUnlockedLevel = Math.max(
+          state.maxUnlockedLevel,
+          Math.min(state.levelIndex + 1, GAME_CONSTANTS.maxLevel)
+        )
         state.status = 'LEVEL_PASSED'
       } else {
         state.nodes = generateNodes(
@@ -198,11 +214,16 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function nextLevel(): void {
-    if (state.levelIndex >= 5) {
+    if (state.levelIndex >= GAME_CONSTANTS.maxLevel) {
       state.status = 'ALL_LEVELS_CLEARED'
       return
     }
     startLevel(state.levelIndex + 1)
+  }
+
+  function selectLevel(levelIndex: number): void {
+    if (levelIndex < 1 || levelIndex > state.maxUnlockedLevel) return
+    startLevel(levelIndex)
   }
 
   function resetGame(): void {
@@ -251,12 +272,14 @@ export const useGameStore = defineStore('game', () => {
     currentCodeLines,
     isGameOver,
     isPaused,
+    availableLevels,
     startLevel,
     togglePause,
     setDirection,
     tick,
     retryLevel,
     nextLevel,
+    selectLevel,
     resetGame,
     renderCanvas
   }

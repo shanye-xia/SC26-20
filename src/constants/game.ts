@@ -42,6 +42,7 @@ export const COLORS = {
 } as const
 
 export const GAME_CONSTANTS = {
+  maxLevel: 5,
   initialLives: 3,
   initialSnakeLength: 3,
   correctScore: 10,

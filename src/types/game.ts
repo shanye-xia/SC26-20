@@ -52,6 +52,7 @@ export interface LevelConfig {
 export interface GameState {
   status: GameStatus
   levelIndex: number
+  maxUnlockedLevel: number
   levelConfig: LevelConfig | null
   lives: number
   score: number
