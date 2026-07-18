@@ -9,6 +9,7 @@
   "initialSnakeLength": 5,
   "obstacleCount": 5,
   "difficulty": 3,
+  "powerUps": ["SHIELD"],
   "correctOrder": [
     "for",
     "let i=0",

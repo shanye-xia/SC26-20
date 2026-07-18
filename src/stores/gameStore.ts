@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, reactive } from 'vue'
+import { nanoid } from 'nanoid'
 import {
+  DIRECTION_VECTORS,
   GAME_CONSTANTS,
   GRID_SIZE
 } from '@/constants/game'
@@ -9,7 +11,9 @@ import type {
   Direction,
   GameState,
   LevelConfig,
+  PowerUp,
   Position,
+  Projectile,
   TickResult
 } from '@/types/game'
 import {
@@ -19,6 +23,8 @@ import {
   drawGrid,
   drawNode,
   drawParticles,
+  drawPowerUp,
+  drawProjectile,
   drawSnake,
   drawWall,
   createParticles,
@@ -27,7 +33,7 @@ import {
   updateParticles
 } from '@/utils/canvas'
 import { getNodeAt, generateNodes, isCorrectNode } from '@/utils/nodes'
-import { generateObstacles, isOutOfBounds, isSelfCollision, positionInList } from '@/utils/grid'
+import { generateObstacles, getRandomEmptyPosition, isOutOfBounds, isSelfCollision, positionInList, positionsEqual } from '@/utils/grid'
 import { loadLevel } from '@/utils/levelLoader'
 import { createSnake, moveSnake, canChangeDirection } from '@/utils/snake'
 
@@ -47,6 +53,13 @@ function createInitialState(): GameState {
     snake: createSnake(CENTER),
     obstacles: [],
     nodes: [],
+    powerUps: [],
+    projectiles: [],
+    activeEffects: {
+      shield: 0,
+      invincibleMs: 0,
+      shots: 0
+    },
     collectedCount: 0,
     speed: 200,
     growCounter: 0,
@@ -95,11 +108,19 @@ export const useGameStore = defineStore('game', () => {
     state.score = 0
     state.snake = createSnake(CENTER, levelConfig.initialSnakeLength ?? GAME_CONSTANTS.initialSnakeLength)
     state.obstacles = generateObstacles(state.snake, levelConfig.obstacleCount ?? 0)
+    state.powerUps = generatePowerUps(levelConfig, state.snake, state.obstacles)
+    state.projectiles = []
+    state.activeEffects = { shield: 0, invincibleMs: 0, shots: 0 }
     state.collectedCount = 0
     state.speed = levelConfig.speed
     state.growCounter = 0
     state.errorFlash = false
-    state.nodes = generateNodes(state.snake, levelConfig, state.collectedCount, state.obstacles)
+    state.nodes = generateNodes(
+      state.snake,
+      levelConfig,
+      state.collectedCount,
+      getBlockedPositions()
+    )
     state.status = 'PAUSED'
   }
 
@@ -126,6 +147,9 @@ export const useGameStore = defineStore('game', () => {
       return { ateNode: false, isCorrect: false, node: null }
     }
 
+    state.activeEffects.invincibleMs = Math.max(0, state.activeEffects.invincibleMs - state.speed)
+    moveProjectiles()
+
     const growBy = state.growCounter > 0 ? 1 : 0
     if (state.growCounter > 0) {
       state.growCounter--
@@ -135,8 +159,16 @@ export const useGameStore = defineStore('game', () => {
     const head = state.snake.body[0]
 
     if (isOutOfBounds(head) || isSelfCollision(state.snake, head) || positionInList(state.obstacles, head)) {
+      if (consumeProtection()) {
+        return { ateNode: false, isCorrect: false, node: null }
+      }
       state.status = 'LEVEL_FAILED'
       return { ateNode: false, isCorrect: false, node: null }
+    }
+
+    const powerUp = getPowerUpAt(head)
+    if (powerUp) {
+      collectPowerUp(powerUp)
     }
 
     const node = getNodeAt(state.nodes, head)
@@ -181,11 +213,21 @@ export const useGameStore = defineStore('game', () => {
           state.snake,
           state.levelConfig as LevelConfig,
           state.collectedCount,
-          state.obstacles
+          getBlockedPositions()
         )
       }
 
       return { ateNode: true, isCorrect: true, node }
+    }
+
+    if (consumeProtection()) {
+      state.nodes = generateNodes(
+        state.snake,
+        state.levelConfig as LevelConfig,
+        state.collectedCount,
+        getBlockedPositions()
+      )
+      return { ateNode: true, isCorrect: false, node }
     }
 
     state.lives--
@@ -204,7 +246,7 @@ export const useGameStore = defineStore('game', () => {
       state.snake,
       state.levelConfig as LevelConfig,
       state.collectedCount,
-      state.obstacles
+      getBlockedPositions()
     )
 
     return { ateNode: true, isCorrect: false, node }
@@ -251,7 +293,15 @@ export const useGameStore = defineStore('game', () => {
       )
     })
 
-    drawSnake(canvasState, state.snake.body, state.snake.direction)
+    state.powerUps.forEach((powerUp) => {
+      drawPowerUp(canvasState, powerUp.position.x, powerUp.position.y, powerUp.type)
+    })
+
+    state.projectiles.forEach((projectile) => {
+      drawProjectile(canvasState, projectile.position.x, projectile.position.y)
+    })
+
+    drawSnake(canvasState, state.snake.body, state.snake.direction, state.activeEffects)
 
     let updatedParticles = updateParticles(particles, 16)
     drawParticles(canvasState, updatedParticles)
@@ -271,6 +321,103 @@ export const useGameStore = defineStore('game', () => {
     state.hardMode = enabled
   }
 
+  function fireShot(): void {
+    if (state.status === 'PAUSED') {
+      state.status = 'PLAYING'
+    }
+    if (state.status !== 'PLAYING' || state.activeEffects.shots <= 0) return
+
+    state.activeEffects.shots--
+    state.projectiles.push({
+      id: nanoid(),
+      position: { ...state.snake.body[0] },
+      direction: state.snake.direction
+    })
+  }
+
+  function moveProjectiles(): void {
+    const nextProjectiles: Projectile[] = []
+
+    for (const projectile of state.projectiles) {
+      const vector = DIRECTION_VECTORS[projectile.direction]
+      const nextPosition = {
+        x: projectile.position.x + vector.x,
+        y: projectile.position.y + vector.y
+      }
+
+      if (isOutOfBounds(nextPosition)) continue
+
+      const obstacleIndex = state.obstacles.findIndex((obstacle) => positionsEqual(obstacle, nextPosition))
+      if (obstacleIndex >= 0) {
+        state.obstacles.splice(obstacleIndex, 1)
+        continue
+      }
+
+      nextProjectiles.push({
+        ...projectile,
+        position: nextPosition
+      })
+    }
+
+    state.projectiles = nextProjectiles
+  }
+
+  function consumeProtection(): boolean {
+    if (state.activeEffects.invincibleMs > 0) return true
+    if (state.activeEffects.shield > 0) {
+      state.activeEffects.shield--
+      return true
+    }
+    return false
+  }
+
+  function getPowerUpAt(position: Position): PowerUp | undefined {
+    return state.powerUps.find((powerUp) => positionsEqual(powerUp.position, position))
+  }
+
+  function collectPowerUp(powerUp: PowerUp): void {
+    state.powerUps = state.powerUps.filter((item) => item.id !== powerUp.id)
+
+    switch (powerUp.type) {
+      case 'SHIELD':
+        state.activeEffects.shield += 1
+        break
+      case 'INVINCIBLE':
+        state.activeEffects.invincibleMs = GAME_CONSTANTS.invincibleDurationMs
+        break
+      case 'SHOT':
+        state.activeEffects.shots += GAME_CONSTANTS.shotCharges
+        break
+    }
+  }
+
+  function generatePowerUps(
+    levelConfig: LevelConfig,
+    snake: ReturnType<typeof createSnake>,
+    obstacles: Position[]
+  ): PowerUp[] {
+    const types = levelConfig.powerUps ?? []
+    const powerUps: PowerUp[] = []
+
+    for (const type of types.slice(0, GAME_CONSTANTS.powerUpSpawnCount)) {
+      const occupiedPowerUps = powerUps.map((powerUp) => ({ position: powerUp.position }))
+      powerUps.push({
+        id: nanoid(),
+        type,
+        position: getRandomEmptyPosition(snake, [...state.nodes, ...occupiedPowerUps], obstacles)
+      })
+    }
+
+    return powerUps
+  }
+
+  function getBlockedPositions(): Position[] {
+    return [
+      ...state.obstacles,
+      ...state.powerUps.map((powerUp) => powerUp.position)
+    ]
+  }
+
   return {
     state,
     currentTargetLabel,
@@ -286,6 +433,7 @@ export const useGameStore = defineStore('game', () => {
     nextLevel,
     selectLevel,
     setHardMode,
+    fireShot,
     resetGame,
     renderCanvas
   }

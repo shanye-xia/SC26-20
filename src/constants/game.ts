@@ -38,6 +38,10 @@ export const COLORS = {
   wallFill: '#f2cd5c',
   wallStroke: '#fff1a8',
   wallShadow: '#8f5d00',
+  powerShield: '#74c7ec',
+  powerInvincible: '#f9e2af',
+  powerShot: '#fab387',
+  projectile: '#fab387',
   border: '#45475a'
 } as const
 
@@ -49,6 +53,9 @@ export const GAME_CONSTANTS = {
   correctGrowth: 1,
   wrongGrowth: 2,
   errorFlashDuration: 200,
+  invincibleDurationMs: 5000,
+  powerUpSpawnCount: 3,
+  shotCharges: 3,
   particleCount: 10,
   particleLife: 250
 } as const

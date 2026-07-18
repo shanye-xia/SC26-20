@@ -55,6 +55,12 @@ export function useInput() {
       return
     }
 
+    if (event.code === 'Space') {
+      event.preventDefault()
+      store.fireShot()
+      return
+    }
+
     const direction = resolveDirection(event)
     if (direction) {
       event.preventDefault()

@@ -68,6 +68,27 @@
           @update:value="store.setHardMode"
         />
       </div>
+
+      <div v-if="availablePowerUps.length" class="power-card">
+        <div class="power-header">
+          <strong>{{ store.state.status === 'PAUSED' ? '本关开始前提示' : '道具状态' }}</strong>
+          <span>空格发射攻击</span>
+        </div>
+        <div class="power-list">
+          <span
+            v-for="powerUp in availablePowerUps"
+            :key="powerUp.type"
+            class="power-chip"
+          >
+            {{ powerUp.label }}：{{ powerUp.description }}
+          </span>
+        </div>
+        <div class="effect-row">
+          <span>护盾 {{ store.state.activeEffects.shield }}</span>
+          <span>无敌 {{ invincibleSeconds }}s</span>
+          <span>弹药 {{ store.state.activeEffects.shots }}</span>
+        </div>
+      </div>
     </section>
 
     <section class="code-section">
@@ -99,6 +120,21 @@ const visibleLevels = computed(() => {
 })
 
 const hasMoreLevels = computed(() => store.availableLevels.length > 5)
+const availablePowerUps = computed(() => {
+  const types = store.state.levelConfig?.powerUps ?? []
+  return types.map((type) => {
+    switch (type) {
+      case 'SHIELD':
+        return { type, label: '护盾', description: '抵消一次撞击或吃错' }
+      case 'INVINCIBLE':
+        return { type, label: '无敌', description: '短时间免疫伤害' }
+      case 'SHOT':
+        return { type, label: '攻击', description: '按空格击碎墙壁' }
+    }
+  })
+})
+
+const invincibleSeconds = computed(() => Math.ceil(store.state.activeEffects.invincibleMs / 1000))
 
 const totalTargets = computed(() => store.state.levelConfig?.correctOrder.length ?? 0)
 
@@ -269,6 +305,43 @@ function escapeHtml(text: string): string {
 }
 
 .mode-row span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.power-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--bg-code);
+}
+
+.power-header,
+.effect-row,
+.power-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.power-header {
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.power-header strong {
+  color: var(--accent-variable);
+}
+
+.power-chip,
+.effect-row span {
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: var(--bg-primary);
   color: var(--text-secondary);
   font-size: 12px;
 }

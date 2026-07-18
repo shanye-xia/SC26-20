@@ -6,6 +6,7 @@ export interface Position {
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
 export type NodeType = 'CORRECT' | 'DISTRACTOR'
+export type PowerUpType = 'SHIELD' | 'INVINCIBLE' | 'SHOT'
 
 export type LevelType = 'order' | 'output' | 'bugfix' | 'matching' | 'flow'
 
@@ -25,6 +26,24 @@ export interface CodeNode {
   orderIndex?: number
 }
 
+export interface PowerUp {
+  id: string
+  type: PowerUpType
+  position: Position
+}
+
+export interface ActiveEffects {
+  shield: number
+  invincibleMs: number
+  shots: number
+}
+
+export interface Projectile {
+  id: string
+  position: Position
+  direction: Direction
+}
+
 export interface Snake {
   body: Position[]
   direction: Direction
@@ -41,6 +60,7 @@ export interface LevelConfig {
   distractorCount: number
   initialSnakeLength?: number
   obstacleCount?: number
+  powerUps?: PowerUpType[]
   correctOrder: string[]
   codeTemplate: string
   distractors: string[]
@@ -59,6 +79,9 @@ export interface GameState {
   snake: Snake
   obstacles: Position[]
   nodes: CodeNode[]
+  powerUps: PowerUp[]
+  projectiles: Projectile[]
+  activeEffects: ActiveEffects
   collectedCount: number
   speed: number
   growCounter: number

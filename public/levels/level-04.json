@@ -9,6 +9,7 @@
   "initialSnakeLength": 6,
   "obstacleCount": 7,
   "difficulty": 4,
+  "powerUps": ["SHIELD", "INVINCIBLE"],
   "correctOrder": [
     "let arr",
     "=",

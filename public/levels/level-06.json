@@ -9,6 +9,7 @@
   "initialSnakeLength": 8,
   "obstacleCount": 10,
   "difficulty": 6,
+  "powerUps": ["SHIELD", "INVINCIBLE", "SHOT"],
   "correctOrder": [
     "const",
     "ready",

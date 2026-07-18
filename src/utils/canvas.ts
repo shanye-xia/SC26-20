@@ -1,4 +1,5 @@
 import { COLORS, GRID_SIZE } from '@/constants/game'
+import type { ActiveEffects, PowerUpType } from '@/types/game'
 
 export interface CanvasState {
   canvas: HTMLCanvasElement
@@ -175,6 +176,39 @@ export function drawWall(state: CanvasState, x: number, y: number): void {
   ctx.stroke()
 }
 
+export function drawPowerUp(state: CanvasState, x: number, y: number, type: PowerUpType): void {
+  const { ctx, cellSize } = state
+  const cx = x * cellSize + cellSize / 2
+  const cy = y * cellSize + cellSize / 2
+  const radius = cellSize * 0.34
+  const color = getPowerUpColor(type)
+
+  ctx.fillStyle = color
+  ctx.strokeStyle = COLORS.textPrimary
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+
+  ctx.fillStyle = COLORS.bgPrimary
+  ctx.font = `bold ${Math.max(10, cellSize * 0.34)}px "JetBrains Mono", monospace`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(getPowerUpLabel(type), cx, cy)
+}
+
+export function drawProjectile(state: CanvasState, x: number, y: number): void {
+  const { ctx, cellSize } = state
+  const cx = x * cellSize + cellSize / 2
+  const cy = y * cellSize + cellSize / 2
+
+  ctx.fillStyle = COLORS.projectile
+  ctx.beginPath()
+  ctx.arc(cx, cy, Math.max(3, cellSize * 0.16), 0, Math.PI * 2)
+  ctx.fill()
+}
+
 function drawCorrectNode(state: CanvasState, x: number, y: number, isCurrentTarget: boolean): void {
   const { ctx, cellSize } = state
   const gap = 2
@@ -231,17 +265,65 @@ function fitTextFontSize(
 export function drawSnake(
   state: CanvasState,
   body: { x: number; y: number }[],
-  headDirection: string
+  headDirection: string,
+  effects?: ActiveEffects
 ): void {
   body.forEach((segment, index) => {
     const isHead = index === 0
     const color = isHead ? lightenColor(COLORS.accentSnake, 20) : COLORS.accentSnake
     drawRoundedCell(state, segment.x, segment.y, color, isHead ? 6 : 4, 2)
+    drawSnakeEffect(state, segment.x, segment.y, effects)
 
     if (isHead) {
       drawEyes(state, segment.x, segment.y, headDirection)
     }
   })
+}
+
+function drawSnakeEffect(
+  state: CanvasState,
+  x: number,
+  y: number,
+  effects?: ActiveEffects
+): void {
+  if (!effects || (!effects.shield && !effects.invincibleMs && !effects.shots)) return
+
+  const { ctx, cellSize } = state
+  const px = x * cellSize + 1
+  const py = y * cellSize + 1
+  const size = cellSize - 2
+
+  ctx.lineWidth = effects.invincibleMs > 0 ? 3 : 2
+  ctx.strokeStyle =
+    effects.invincibleMs > 0
+      ? COLORS.powerInvincible
+      : effects.shield > 0
+        ? COLORS.powerShield
+        : COLORS.powerShot
+  roundRect(ctx, px, py, size, size, 6)
+  ctx.stroke()
+}
+
+function getPowerUpColor(type: PowerUpType): string {
+  switch (type) {
+    case 'SHIELD':
+      return COLORS.powerShield
+    case 'INVINCIBLE':
+      return COLORS.powerInvincible
+    case 'SHOT':
+      return COLORS.powerShot
+  }
+}
+
+function getPowerUpLabel(type: PowerUpType): string {
+  switch (type) {
+    case 'SHIELD':
+      return '盾'
+    case 'INVINCIBLE':
+      return '无'
+    case 'SHOT':
+      return '弹'
+  }
 }
 
 function drawEyes(
