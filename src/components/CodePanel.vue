@@ -4,7 +4,7 @@
       <h3 class="section-title">关卡选择</h3>
       <div class="level-picker" aria-label="关卡选择">
         <n-button
-          v-for="item in store.availableLevels"
+          v-for="item in visibleLevels"
           :key="item.level"
           size="small"
           class="level-button"
@@ -13,6 +13,14 @@
           @click="store.selectLevel(item.level)"
         >
           {{ item.level }}
+        </n-button>
+        <n-button
+          v-if="hasMoreLevels"
+          size="small"
+          class="level-button all-button"
+          @click="showAllLevels = !showAllLevels"
+        >
+          {{ showAllLevels ? '收起' : '全部' }}
         </n-button>
       </div>
     </section>
@@ -47,7 +55,7 @@
         <span>目标 {{ store.state.levelConfig?.correctOrder.length ?? 0 }}</span>
         <span>初始长度 {{ store.state.levelConfig?.initialSnakeLength ?? 3 }}</span>
         <span>墙壁 {{ store.state.obstacles.length }}</span>
-        <span>已解锁 {{ store.state.maxUnlockedLevel }}/5</span>
+        <span>已解锁 {{ store.state.maxUnlockedLevel }}/{{ store.availableLevels.length }}</span>
       </div>
     </section>
 
@@ -67,11 +75,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { NButton, NCard } from 'naive-ui'
 import { useGameStore } from '@/stores/gameStore'
 
 const store = useGameStore()
+const showAllLevels = ref(false)
+
+const visibleLevels = computed(() => {
+  if (showAllLevels.value) return store.availableLevels
+  return store.availableLevels.slice(0, 5)
+})
+
+const hasMoreLevels = computed(() => store.availableLevels.length > 5)
 
 const totalTargets = computed(() => store.state.levelConfig?.correctOrder.length ?? 0)
 
@@ -131,6 +147,12 @@ function escapeHtml(text: string): string {
 .code-panel {
   height: 100%;
   background-color: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+.code-panel :deep(.n-card-header__main),
+.code-panel :deep(.n-card__content) {
+  color: var(--text-primary);
 }
 
 .level-section,
@@ -162,7 +184,7 @@ function escapeHtml(text: string): string {
 
 .level-picker {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -171,15 +193,31 @@ function escapeHtml(text: string): string {
   font-family: "JetBrains Mono", "Fira Code", monospace;
 }
 
+.level-button :deep(.n-button__content) {
+  color: var(--text-primary);
+}
+
 .level-button.active {
-  color: #000000;
-  background-color: var(--accent-variable);
-  border-color: var(--accent-variable);
+  color: var(--text-primary);
+  background-color: rgba(137, 180, 250, 0.28);
+  border-color: var(--accent-function);
   font-weight: 700;
+}
+
+.level-button.active :deep(.n-button__content) {
+  color: var(--text-primary);
 }
 
 .level-button.locked {
   opacity: 0.45;
+}
+
+.level-button.locked :deep(.n-button__content) {
+  color: var(--text-secondary);
+}
+
+.all-button {
+  border-color: var(--accent-variable);
 }
 
 .level-stats {

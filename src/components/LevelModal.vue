@@ -15,7 +15,7 @@
       </n-card>
 
       <div class="modal-actions">
-        <n-button v-if="store.state.status === 'LEVEL_PASSED' && store.state.levelIndex < 5" type="primary" @click="store.nextLevel()">
+        <n-button v-if="store.state.status === 'LEVEL_PASSED' && store.state.levelIndex < store.availableLevels.length" type="primary" @click="store.nextLevel()">
           下一关
         </n-button>
         <n-button v-else-if="store.state.status === 'LEVEL_FAILED'" type="primary" @click="store.retryLevel()">
@@ -48,7 +48,7 @@ const isVisible = computed(() => {
 const modalTitle = computed(() => {
   switch (store.state.status) {
     case 'LEVEL_PASSED':
-      return store.state.levelIndex >= 5 ? '全部通关！' : '关卡完成！'
+      return store.state.levelIndex >= store.availableLevels.length ? '全部通关！' : '关卡完成！'
     case 'LEVEL_FAILED':
       return '关卡失败'
     case 'ALL_LEVELS_CLEARED':

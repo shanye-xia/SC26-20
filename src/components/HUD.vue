@@ -8,7 +8,7 @@
 
       <div class="general-info">
         <span>关卡 {{ store.state.levelIndex }}</span>
-        <span>已解锁 {{ store.state.maxUnlockedLevel }}/5</span>
+        <span>已解锁 {{ store.state.maxUnlockedLevel }}/{{ store.availableLevels.length }}</span>
         <span>得分 {{ store.state.score }}</span>
         <span>{{ statusLabel }}</span>
       </div>

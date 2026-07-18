@@ -1,0 +1,29 @@
+{
+  "id": 8,
+  "type": "order",
+  "title": "提前返回",
+  "description": "按正确顺序吃掉 guard clause 提前返回的代码节点。",
+  "speed": 120,
+  "lives": 3,
+  "distractorCount": 4,
+  "initialSnakeLength": 8,
+  "obstacleCount": 12,
+  "difficulty": 8,
+  "correctOrder": [
+    "if",
+    "!",
+    "user",
+    "return",
+    "null",
+    "render",
+    "user"
+  ],
+  "codeTemplate": "{1} ({2}{3}) {4} {5};\n{6}({7});",
+  "distractors": [
+    "else",
+    "true",
+    "break",
+    "item"
+  ],
+  "explanation": "提前返回可以先处理无效输入，让后续主流程更清晰。"
+}

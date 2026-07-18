@@ -1,0 +1,30 @@
+{
+  "id": 10,
+  "type": "order",
+  "title": "错误处理",
+  "description": "按正确顺序吃掉 try/catch 错误处理的代码节点。",
+  "speed": 100,
+  "lives": 3,
+  "distractorCount": 4,
+  "initialSnakeLength": 8,
+  "obstacleCount": 14,
+  "difficulty": 10,
+  "correctOrder": [
+    "try",
+    "{",
+    "run",
+    "()",
+    "}",
+    "catch",
+    "err",
+    "handle"
+  ],
+  "codeTemplate": "{1} {2}\n  {3}{4};\n{5} {6} ({7}) {\n  {8}(err);\n}",
+  "distractors": [
+    "finally",
+    "throw",
+    "error",
+    "stop"
+  ],
+  "explanation": "try/catch 用于捕获运行时错误，catch 块中可以集中处理异常。"
+}
