@@ -6,13 +6,17 @@
   "speed": 230,
   "lives": 3,
   "distractorCount": 3,
+  "initialSnakeLength": 4,
+  "obstacleCount": 3,
+  "difficulty": 2,
   "correctOrder": [
     "if",
     "score>10",
     "{",
-    "win"
+    "win",
+    "()"
   ],
-  "codeTemplate": "{1} ({2}) {3}\n  {4}();",
+  "codeTemplate": "{1} ({2}) {3}\n  {4}{5};\n}",
   "distractors": [
     "else",
     "for",

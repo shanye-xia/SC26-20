@@ -6,6 +6,9 @@
   "speed": 200,
   "lives": 3,
   "distractorCount": 3,
+  "initialSnakeLength": 5,
+  "obstacleCount": 5,
+  "difficulty": 3,
   "correctOrder": [
     "for",
     "let i=0",

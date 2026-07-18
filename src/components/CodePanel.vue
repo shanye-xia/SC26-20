@@ -71,7 +71,7 @@ function escapeHtml(text: string): string {
   background-color: var(--bg-code);
   border-radius: 8px;
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: 14px;
+  font-size: var(--code-font-size);
   line-height: 1.6;
   color: var(--text-primary);
   overflow-x: auto;
@@ -85,9 +85,13 @@ function escapeHtml(text: string): string {
 }
 
 .code-segment.lit {
-  color: var(--accent-string);
-  background-color: rgba(166, 227, 161, 0.15);
+  color: var(--accent-lit-text) !important;
+  background-color: var(--accent-lit-bg) !important;
+  font-weight: 700;
   opacity: 1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.35);
 }
 
 .code-segment.dim {

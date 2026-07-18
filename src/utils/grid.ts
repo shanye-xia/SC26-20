@@ -35,9 +35,10 @@ export function getOccupiedPositions(snake: Snake, nodes: { position: Position }
 
 export function getRandomEmptyPosition(
   snake: Snake,
-  nodes: { position: Position }[]
+  nodes: { position: Position }[],
+  blockedPositions: Position[] = []
 ): Position {
-  const occupied = getOccupiedPositions(snake, nodes)
+  const occupied = [...getOccupiedPositions(snake, nodes), ...blockedPositions]
   const occupiedSet = new Set(occupied.map((p) => `${p.x},${p.y}`))
   const empty: Position[] = []
 
@@ -54,6 +55,25 @@ export function getRandomEmptyPosition(
   }
 
   return empty[Math.floor(Math.random() * empty.length)]
+}
+
+export function positionInList(positions: Position[], target: Position): boolean {
+  return positions.some((position) => positionsEqual(position, target))
+}
+
+export function generateObstacles(
+  snake: Snake,
+  count: number,
+  reservedPositions: Position[] = []
+): Position[] {
+  const obstacles: Position[] = []
+  const safeCount = Math.max(0, count)
+
+  for (let i = 0; i < safeCount; i++) {
+    obstacles.push(getRandomEmptyPosition(snake, obstacles.map((position) => ({ position })), reservedPositions))
+  }
+
+  return obstacles
 }
 
 export function positionsEqual(a: Position, b: Position): boolean {

@@ -35,11 +35,15 @@ export const COLORS = {
   accentHealth: '#f7768e',
   accentSnake: '#89dceb',
   accentNode: '#b4befe',
+  wallFill: '#f2cd5c',
+  wallStroke: '#fff1a8',
+  wallShadow: '#8f5d00',
   border: '#45475a'
 } as const
 
 export const GAME_CONSTANTS = {
   initialLives: 3,
+  initialSnakeLength: 3,
   correctScore: 10,
   correctGrowth: 1,
   wrongGrowth: 2,

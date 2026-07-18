@@ -9,6 +9,13 @@ describe('snake utils', () => {
     expect(snake.direction).toBe('RIGHT')
   })
 
+  it('should create snake with custom length', () => {
+    const snake = createSnake({ x: 7, y: 5 }, 5)
+    expect(snake.body).toHaveLength(5)
+    expect(snake.body[0]).toEqual({ x: 7, y: 5 })
+    expect(snake.body[4]).toEqual({ x: 3, y: 5 })
+  })
+
   it('should calculate next head', () => {
     const snake = createSnake({ x: 5, y: 5 })
     expect(getNextHead(snake)).toEqual({ x: 6, y: 5 })

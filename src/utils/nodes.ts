@@ -6,13 +6,14 @@ export function createCorrectNode(
   snake: Snake,
   nodes: CodeNode[],
   label: string,
-  orderIndex: number
+  orderIndex: number,
+  blockedPositions: Position[] = []
 ): CodeNode {
   return {
     id: nanoid(),
     label,
     type: 'CORRECT',
-    position: getRandomEmptyPosition(snake, nodes),
+    position: getRandomEmptyPosition(snake, nodes, blockedPositions),
     orderIndex
   }
 }
@@ -20,26 +21,28 @@ export function createCorrectNode(
 export function createDistractorNode(
   snake: Snake,
   nodes: CodeNode[],
-  label: string
+  label: string,
+  blockedPositions: Position[] = []
 ): CodeNode {
   return {
     id: nanoid(),
     label,
     type: 'DISTRACTOR',
-    position: getRandomEmptyPosition(snake, nodes)
+    position: getRandomEmptyPosition(snake, nodes, blockedPositions)
   }
 }
 
 export function generateNodes(
   snake: Snake,
   levelConfig: LevelConfig,
-  collectedCount: number
+  collectedCount: number,
+  blockedPositions: Position[] = []
 ): CodeNode[] {
   const nodes: CodeNode[] = []
 
   const correctLabel = levelConfig.correctOrder[collectedCount]
   if (correctLabel !== undefined) {
-    const correctNode = createCorrectNode(snake, nodes, correctLabel, collectedCount)
+    const correctNode = createCorrectNode(snake, nodes, correctLabel, collectedCount, blockedPositions)
     nodes.push(correctNode)
   }
 
@@ -51,7 +54,7 @@ export function generateNodes(
   for (let i = 0; i < distractorCount; i++) {
     const label =
       levelConfig.distractors[Math.floor(Math.random() * levelConfig.distractors.length)]
-    const distractorNode = createDistractorNode(snake, nodes, label)
+    const distractorNode = createDistractorNode(snake, nodes, label, blockedPositions)
     nodes.push(distractorNode)
   }
 

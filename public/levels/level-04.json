@@ -6,14 +6,18 @@
   "speed": 180,
   "lives": 3,
   "distractorCount": 3,
+  "initialSnakeLength": 6,
+  "obstacleCount": 7,
+  "difficulty": 4,
   "correctOrder": [
     "let arr",
     "=",
     "[1,2,3]",
     "for",
+    "let x",
     "log(x)"
   ],
-  "codeTemplate": "{1} {2} {3};\n{4} (let x of arr) {\n  {5};\n}",
+  "codeTemplate": "{1} {2} {3};\n{4} ({5} of arr) {\n  {6};\n}",
   "distractors": [
     "while",
     "[1,2",

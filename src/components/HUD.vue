@@ -4,6 +4,19 @@
       <div class="level-info">
         <h2 class="level-title">{{ store.state.levelConfig?.title || 'Code Snake' }}</h2>
         <p class="level-description">{{ store.state.levelConfig?.description || '按正确顺序吃掉代码节点' }}</p>
+
+        <div class="rules-box">
+          <strong>规则：</strong>
+          <span>{{ store.state.levelConfig?.rules || '按正确顺序吃掉代码节点；吃错扣生命并增长蛇身。使用方向键或 WASD 控制。' }}</span>
+        </div>
+
+        <div class="level-stats">
+          <span>关卡 {{ store.state.levelIndex }}/5</span>
+          <span>难度 {{ store.state.levelConfig?.difficulty ?? store.state.levelIndex }}</span>
+          <span>目标 {{ store.state.levelConfig?.correctOrder.length ?? 0 }}</span>
+          <span>初始长度 {{ store.state.levelConfig?.initialSnakeLength ?? 3 }}</span>
+          <span>墙壁 {{ store.state.obstacles.length }}</span>
+        </div>
       </div>
 
       <div class="progress">
@@ -87,8 +100,9 @@ const progressItems = computed(() => {
 }
 
 .progress-item.lit {
-  color: var(--accent-string);
-  background-color: rgba(166, 227, 161, 0.15);
+  color: #000000 !important;
+  background-color: var(--progress-lit-bg) !important;
+  font-weight: 700;
 }
 
 .progress-item.current {
@@ -103,5 +117,35 @@ const progressItems = computed(() => {
   background-color: rgba(249, 226, 175, 0.1);
   border-radius: 4px;
   text-align: center;
+}
+
+.rules-box {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background-color: var(--rules-bg);
+  border-left: 4px solid var(--rules-accent);
+  color: var(--text-primary);
+  font-size: 13px;
+  border-radius: 6px;
+}
+.rules-box strong {
+  margin-right: 6px;
+  color: var(--rules-accent);
+}
+
+.level-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.level-stats span {
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--bg-code);
+  color: var(--text-secondary);
+  font-size: 12px;
 }
 </style>

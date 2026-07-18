@@ -134,7 +134,7 @@ export function drawNode(
     drawCorrectNode(state, x, y, isCurrentTarget)
   }
 
-  ctx.fillStyle = COLORS.textPrimary
+  ctx.fillStyle = isDistractor ? COLORS.textPrimary : COLORS.bgPrimary
   ctx.font = `${Math.max(10, cellSize * 0.4)}px "JetBrains Mono", "Fira Code", monospace`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
@@ -148,6 +148,30 @@ export function drawNode(
     x * cellSize + cellSize / 2,
     y * cellSize + cellSize / 2
   )
+}
+
+export function drawWall(state: CanvasState, x: number, y: number): void {
+  const { ctx, cellSize } = state
+  const gap = 2
+  const px = x * cellSize + gap
+  const py = y * cellSize + gap
+  const size = cellSize - gap * 2
+
+  ctx.fillStyle = COLORS.wallFill
+  ctx.strokeStyle = COLORS.wallStroke
+  ctx.lineWidth = 2
+  roundRect(ctx, px, py, size, size, 4)
+  ctx.fill()
+  ctx.stroke()
+
+  ctx.strokeStyle = COLORS.wallShadow
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.moveTo(px + size * 0.2, py + size * 0.85)
+  ctx.lineTo(px + size * 0.85, py + size * 0.2)
+  ctx.moveTo(px + size * 0.55, py + size * 0.9)
+  ctx.lineTo(px + size * 0.9, py + size * 0.55)
+  ctx.stroke()
 }
 
 function drawCorrectNode(state: CanvasState, x: number, y: number, isCurrentTarget: boolean): void {

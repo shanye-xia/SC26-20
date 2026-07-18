@@ -39,9 +39,12 @@ export interface LevelConfig {
   speed: number
   lives: number
   distractorCount: number
+  initialSnakeLength?: number
+  obstacleCount?: number
   correctOrder: string[]
   codeTemplate: string
   distractors: string[]
+  rules?: string
   explanation: string
   difficulty?: number
 }
@@ -53,6 +56,7 @@ export interface GameState {
   lives: number
   score: number
   snake: Snake
+  obstacles: Position[]
   nodes: CodeNode[]
   collectedCount: number
   speed: number

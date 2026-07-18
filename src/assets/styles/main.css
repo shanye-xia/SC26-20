@@ -8,6 +8,12 @@
   --accent-keyword: #f38ba8;
   --accent-variable: #f9e2af;
   --accent-string: #a6e3a1;
+  --accent-lit-bg: #007f3d;
+  --accent-lit-text: #000000;
+  --progress-lit-bg: rgba(0,127,61,0.9);
+  --code-font-size: 15px;
+  --rules-bg: rgba(250, 204, 21, 0.08);
+  --rules-accent: #f6c84c;
   --accent-function: #89b4fa;
   --accent-error: #f38ba8;
   --accent-health: #f7768e;
@@ -42,7 +48,6 @@ body {
 
 #app {
   width: 100%;
-  min-height: 100vh;
   padding: 16px;
 }
 

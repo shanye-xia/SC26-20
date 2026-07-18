@@ -1,9 +1,15 @@
 import { DIRECTION_VECTORS } from '@/constants/game'
 import type { Direction, Position, Snake } from '@/types/game'
 
-export function createSnake(start: Position): Snake {
+export function createSnake(start: Position, length: number = 3): Snake {
+  const safeLength = Math.max(1, length)
+  const body = Array.from({ length: safeLength }, (_, index) => ({
+    x: start.x - index,
+    y: start.y
+  }))
+
   return {
-    body: [start, { x: start.x - 1, y: start.y }, { x: start.x - 2, y: start.y }],
+    body,
     direction: 'RIGHT',
     nextDirection: 'RIGHT'
   }

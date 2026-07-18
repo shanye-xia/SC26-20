@@ -5,6 +5,7 @@ import {
   isSelfCollision,
   getRandomEmptyPosition,
   getOccupiedPositions,
+  generateObstacles,
   positionsEqual
 } from '@/utils/grid'
 import { createSnake } from '@/utils/snake'
@@ -40,6 +41,17 @@ describe('grid utils', () => {
     const empty = getRandomEmptyPosition(snake, nodes)
     expect(isOutOfBounds(empty)).toBe(false)
     expect(isSelfCollision(snake, empty)).toBe(false)
+  })
+
+  it('should generate obstacles away from the snake', () => {
+    const snake = createSnake({ x: 5, y: 5 })
+    const obstacles = generateObstacles(snake, 4)
+
+    expect(obstacles).toHaveLength(4)
+    obstacles.forEach((obstacle) => {
+      expect(isOutOfBounds(obstacle)).toBe(false)
+      expect(isSelfCollision(snake, obstacle)).toBe(false)
+    })
   })
 
   it('should compare positions', () => {

@@ -20,13 +20,14 @@ import {
   drawNode,
   drawParticles,
   drawSnake,
+  drawWall,
   createParticles,
   type CanvasState,
   type Particle,
   updateParticles
 } from '@/utils/canvas'
 import { getNodeAt, generateNodes, isCorrectNode } from '@/utils/nodes'
-import { isOutOfBounds, isSelfCollision } from '@/utils/grid'
+import { generateObstacles, isOutOfBounds, isSelfCollision, positionInList } from '@/utils/grid'
 import { loadLevel } from '@/utils/levelLoader'
 import { createSnake, moveSnake, canChangeDirection } from '@/utils/snake'
 
@@ -43,6 +44,7 @@ function createInitialState(): GameState {
     lives: GAME_CONSTANTS.initialLives,
     score: 0,
     snake: createSnake(CENTER),
+    obstacles: [],
     nodes: [],
     collectedCount: 0,
     speed: 200,
@@ -78,12 +80,13 @@ export const useGameStore = defineStore('game', () => {
     state.levelConfig = levelConfig
     state.lives = levelConfig.lives
     state.score = 0
-    state.snake = createSnake(CENTER)
+    state.snake = createSnake(CENTER, levelConfig.initialSnakeLength ?? GAME_CONSTANTS.initialSnakeLength)
+    state.obstacles = generateObstacles(state.snake, levelConfig.obstacleCount ?? 0)
     state.collectedCount = 0
     state.speed = levelConfig.speed
     state.growCounter = 0
     state.errorFlash = false
-    state.nodes = generateNodes(state.snake, levelConfig, state.collectedCount)
+    state.nodes = generateNodes(state.snake, levelConfig, state.collectedCount, state.obstacles)
     state.status = 'PAUSED'
   }
 
@@ -118,7 +121,7 @@ export const useGameStore = defineStore('game', () => {
     state.snake = moveSnake(state.snake, growBy)
     const head = state.snake.body[0]
 
-    if (isOutOfBounds(head) || isSelfCollision(state.snake, head)) {
+    if (isOutOfBounds(head) || isSelfCollision(state.snake, head) || positionInList(state.obstacles, head)) {
       state.status = 'LEVEL_FAILED'
       return { ateNode: false, isCorrect: false, node: null }
     }
@@ -160,7 +163,8 @@ export const useGameStore = defineStore('game', () => {
         state.nodes = generateNodes(
           state.snake,
           state.levelConfig as LevelConfig,
-          state.collectedCount
+          state.collectedCount,
+          state.obstacles
         )
       }
 
@@ -182,7 +186,8 @@ export const useGameStore = defineStore('game', () => {
     state.nodes = generateNodes(
       state.snake,
       state.levelConfig as LevelConfig,
-      state.collectedCount
+      state.collectedCount,
+      state.obstacles
     )
 
     return { ateNode: true, isCorrect: false, node }
@@ -208,6 +213,10 @@ export const useGameStore = defineStore('game', () => {
   function renderCanvas(canvasState: CanvasState, particles: Particle[]): Particle[] {
     drawBackground(canvasState)
     drawGrid(canvasState)
+
+    state.obstacles.forEach((obstacle) => {
+      drawWall(canvasState, obstacle.x, obstacle.y)
+    })
 
     state.nodes.forEach((node) => {
       drawNode(

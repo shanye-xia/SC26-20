@@ -7,6 +7,10 @@ const KEY_MAP: Record<string, Direction> = {
   ArrowDown: 'DOWN',
   ArrowLeft: 'LEFT',
   ArrowRight: 'RIGHT',
+  Up: 'UP',
+  Down: 'DOWN',
+  Left: 'LEFT',
+  Right: 'RIGHT',
   w: 'UP',
   W: 'UP',
   s: 'DOWN',
@@ -15,6 +19,21 @@ const KEY_MAP: Record<string, Direction> = {
   A: 'LEFT',
   d: 'RIGHT',
   D: 'RIGHT'
+}
+
+const CODE_MAP: Record<string, Direction> = {
+  ArrowUp: 'UP',
+  ArrowDown: 'DOWN',
+  ArrowLeft: 'LEFT',
+  ArrowRight: 'RIGHT',
+  KeyW: 'UP',
+  KeyS: 'DOWN',
+  KeyA: 'LEFT',
+  KeyD: 'RIGHT'
+}
+
+export function resolveDirection(event: Pick<KeyboardEvent, 'key' | 'code'>): Direction | undefined {
+  return KEY_MAP[event.key] ?? CODE_MAP[event.code]
 }
 
 export function useInput() {
@@ -36,7 +55,7 @@ export function useInput() {
       return
     }
 
-    const direction = KEY_MAP[event.key]
+    const direction = resolveDirection(event)
     if (direction) {
       event.preventDefault()
       lastDirection.value = direction

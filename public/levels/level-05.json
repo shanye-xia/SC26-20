@@ -6,14 +6,19 @@
   "speed": 150,
   "lives": 3,
   "distractorCount": 3,
+  "initialSnakeLength": 7,
+  "obstacleCount": 9,
+  "difficulty": 5,
   "correctOrder": [
     "function",
     "greet",
     "()",
     "{",
-    "hello()"
+    "hello",
+    "()",
+    "}"
   ],
-  "codeTemplate": "{1} {2}{3} {4}\n  {5};\n}",
+  "codeTemplate": "{1} {2}{3} {4}\n  {5}{6};\n{7}",
   "distractors": [
     "class",
     "greet",
