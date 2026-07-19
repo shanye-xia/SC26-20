@@ -6,6 +6,8 @@
     :title="modalTitle"
     class="level-modal"
     style="width: 500px; max-width: 90vw"
+    closable
+    @close="handleModalAction"
   >
     <div class="modal-content">
       <pre class="result-code"><code>{{ fullCode }}</code></pre>
@@ -15,14 +17,8 @@
       </n-card>
 
       <div class="modal-actions">
-        <n-button v-if="store.state.status === 'LEVEL_PASSED' && store.state.levelIndex < store.availableLevels.length" type="primary" @click="store.nextLevel()">
-          下一关
-        </n-button>
-        <n-button v-else-if="store.state.status === 'LEVEL_FAILED'" type="primary" @click="store.retryLevel()">
-          重试本关
-        </n-button>
-        <n-button v-else-if="store.state.status === 'ALL_LEVELS_CLEARED'" type="primary" @click="store.resetGame()">
-          再玩一次
+        <n-button type="primary" @click="handleModalAction">
+          {{ actionLabel }}
         </n-button>
       </div>
     </div>
@@ -58,6 +54,19 @@ const modalTitle = computed(() => {
   }
 })
 
+const actionLabel = computed(() => {
+  switch (store.state.status) {
+    case 'LEVEL_PASSED':
+      return store.state.levelIndex >= store.availableLevels.length ? '完成' : '下一关'
+    case 'LEVEL_FAILED':
+      return '重试本关'
+    case 'ALL_LEVELS_CLEARED':
+      return '再玩一次'
+    default:
+      return '关闭'
+  }
+})
+
 const fullCode = computed(() => {
   const config = store.state.levelConfig
   if (!config) return ''
@@ -65,6 +74,20 @@ const fullCode = computed(() => {
 })
 
 const explanation = computed(() => store.state.levelConfig?.explanation ?? '')
+
+function handleModalAction(): void {
+  switch (store.state.status) {
+    case 'LEVEL_PASSED':
+      store.nextLevel()
+      break
+    case 'LEVEL_FAILED':
+      store.retryLevel()
+      break
+    case 'ALL_LEVELS_CLEARED':
+      store.resetGame()
+      break
+  }
+}
 </script>
 
 <style scoped>

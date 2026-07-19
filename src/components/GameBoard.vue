@@ -41,7 +41,8 @@ watch(
 .game-board {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;

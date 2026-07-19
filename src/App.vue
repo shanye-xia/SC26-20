@@ -9,9 +9,10 @@
       </div>
 
       <StatusBar class="status-bar" />
-      <DebugPanel v-if="isDev" />
       <LevelModal />
     </div>
+
+    <DebugPanel v-if="isDev" />
   </n-config-provider>
 </template>
 
@@ -66,7 +67,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: calc(100vh - 32px);
+  height: calc(100vh - 32px);
+  min-height: 0;
 }
 
 .app::before {
@@ -88,20 +90,25 @@ onMounted(() => {
   flex: 1;
   min-height: 0;
   align-items: start;
+  overflow: hidden;
 }
 
 .game-board {
   min-width: 0;
+  min-height: 0;
 }
 
 .code-panel {
   min-width: 280px;
+  min-height: 0;
+  overflow: auto;
 }
 
 @media (max-width: 768px) {
   .main-content {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
+    overflow: visible;
   }
 
   .code-panel {

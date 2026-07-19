@@ -26,7 +26,12 @@ export function useGameLoop(canvasRef: ReactLikeRef<HTMLCanvasElement | null>) {
     const parent = canvasRef.value.parentElement
     if (!parent) return
 
-    const size = Math.min(parent.clientWidth, parent.clientHeight)
+    const viewportPadding = 32
+    const availableViewportHeight = window.innerHeight - parent.getBoundingClientRect().top - viewportPadding
+    const size = Math.max(
+      240,
+      Math.floor(Math.min(parent.clientWidth, parent.clientHeight, availableViewportHeight))
+    )
     containerSize.value = size
     resizeCanvas(canvasState.value, size)
     render()

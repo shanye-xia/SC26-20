@@ -56,6 +56,7 @@ body {
     radial-gradient(circle at 22% 82%, rgba(255, 102, 189, 0.1), transparent 30%),
     linear-gradient(135deg, #020712 0%, #061224 48%, #020711 100%);
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #app {
@@ -74,5 +75,11 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 768px), (max-height: 620px) {
+  body {
+    overflow: auto;
   }
 }
