@@ -87,6 +87,7 @@ export interface GameState {
   growCounter: number
   errorFlash: boolean
   hardMode: boolean
+  blockedAfterCollision: boolean
 }
 
 export interface TickResult {

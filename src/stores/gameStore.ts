@@ -65,7 +65,8 @@ function createInitialState(): GameState {
     speed: 200,
     growCounter: 0,
     errorFlash: false,
-    hardMode: false
+    hardMode: false,
+    blockedAfterCollision: false
   }
 }
 
@@ -117,6 +118,7 @@ export const useGameStore = defineStore('game', () => {
     state.speed = levelConfig.speed
     state.growCounter = 0
     state.errorFlash = false
+    state.blockedAfterCollision = false
     state.nodes = generateNodes(
       state.snake,
       levelConfig,
@@ -141,6 +143,9 @@ export const useGameStore = defineStore('game', () => {
     if (state.status !== 'PLAYING') return
     if (canChangeDirection(state.snake.direction, direction)) {
       state.snake.nextDirection = direction
+      if (direction !== state.snake.direction) {
+        state.blockedAfterCollision = false
+      }
     }
   }
 
@@ -152,8 +157,17 @@ export const useGameStore = defineStore('game', () => {
     state.activeEffects.invincibleMs = Math.max(0, state.activeEffects.invincibleMs - state.speed)
     moveProjectiles()
 
+    if (state.blockedAfterCollision) {
+      return { ateNode: false, isCorrect: false, node: null }
+    }
+
     const nextHead = getNextHead(state.snake)
-    if (isOutOfBounds(nextHead) || positionInList(state.obstacles, nextHead)) {
+    if (isOutOfBounds(nextHead)) {
+      handleWallMove()
+      return { ateNode: false, isCorrect: false, node: null }
+    }
+
+    if (positionInList(state.obstacles, nextHead)) {
       handleBlockedMove()
       return { ateNode: false, isCorrect: false, node: null }
     }
@@ -453,6 +467,11 @@ export const useGameStore = defineStore('game', () => {
     if (state.lives <= 0) {
       state.status = 'LEVEL_FAILED'
     }
+  }
+
+  function handleWallMove(): void {
+    state.blockedAfterCollision = true
+    handleBlockedMove()
   }
 
   function getPowerUpAt(position: Position): PowerUp | undefined {
