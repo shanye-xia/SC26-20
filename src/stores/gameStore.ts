@@ -34,7 +34,7 @@ import {
   updateParticles
 } from '@/utils/canvas'
 import { getNodeAt, generateNodes, isCorrectNode } from '@/utils/nodes'
-import { generateObstacles, getRandomEmptyPosition, isOutOfBounds, isSelfCollision, positionInList, positionsEqual } from '@/utils/grid'
+import { generateObstacles, getRandomEmptyPosition, isOutOfBounds, isSelfCollision, positionsEqual } from '@/utils/grid'
 import { loadLevel } from '@/utils/levelLoader'
 import { createSnake, moveSnake, canChangeDirection, getNextHead } from '@/utils/snake'
 
@@ -167,7 +167,9 @@ export const useGameStore = defineStore('game', () => {
       return { ateNode: false, isCorrect: false, node: null }
     }
 
-    if (positionInList(state.obstacles, nextHead)) {
+    const obstacleIndex = state.obstacles.findIndex((obstacle) => positionsEqual(obstacle, nextHead))
+    if (obstacleIndex >= 0) {
+      state.obstacles.splice(obstacleIndex, 1)
       handleBlockedMove()
       return { ateNode: false, isCorrect: false, node: null }
     }
