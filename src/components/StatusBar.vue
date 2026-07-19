@@ -43,8 +43,11 @@ const store = useGameStore()
 
 <style scoped>
 .status-bar {
-  background-color: var(--bg-panel);
+  background:
+    linear-gradient(135deg, rgba(8, 22, 40, 0.94), rgba(3, 10, 22, 0.92));
+  border: 1px solid var(--panel-border-soft);
   margin-top: 12px;
+  box-shadow: var(--panel-glow);
 }
 
 .status-content {
@@ -59,18 +62,25 @@ const store = useGameStore()
   display: flex;
   align-items: center;
   gap: 8px;
+  min-height: 34px;
+  padding: 5px 10px;
+  border: 1px solid rgba(67, 122, 180, 0.34);
+  border-radius: 7px;
+  background: rgba(6, 14, 28, 0.74);
 }
 
 .status-label {
   font-size: 13px;
   color: var(--text-secondary);
+  letter-spacing: 0;
 }
 
 .status-value {
   font-size: 16px;
   font-weight: 600;
-  color: var(--accent-variable);
+  color: var(--neon-gold);
   font-family: "JetBrains Mono", "Fira Code", monospace;
+  text-shadow: 0 0 10px rgba(255, 215, 90, 0.3);
 }
 
 .hearts {
@@ -85,6 +95,7 @@ const store = useGameStore()
 .heart-icon.filled {
   color: var(--accent-health);
   fill: var(--accent-health);
+  filter: drop-shadow(0 0 7px rgba(255, 111, 136, 0.5));
 }
 
 .heart-icon.empty {
@@ -93,5 +104,12 @@ const store = useGameStore()
 
 .controls {
   margin-left: auto;
+}
+
+.controls :deep(.n-button) {
+  border-color: rgba(32, 231, 255, 0.42);
+  background: rgba(3, 19, 37, 0.86);
+  color: var(--neon-cyan);
+  box-shadow: inset 0 0 14px rgba(32, 231, 255, 0.08);
 }
 </style>

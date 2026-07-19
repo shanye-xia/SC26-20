@@ -39,19 +39,50 @@ watch(
 
 <style scoped>
 .game-board {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-code);
+  padding: 0;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(32, 200, 255, 0.1), transparent 48%),
+    linear-gradient(135deg, rgba(7, 19, 35, 0.98), rgba(2, 8, 18, 0.98));
+  border: 1px solid var(--panel-border);
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: var(--panel-glow);
+}
+
+.game-board::before,
+.game-board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+.game-board::before {
+  background-image:
+    linear-gradient(rgba(32, 200, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(32, 200, 255, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.game-board::after {
+  border: 1px solid rgba(32, 231, 255, 0.18);
+  box-shadow: inset 0 0 38px rgba(32, 200, 255, 0.1);
 }
 
 .game-canvas {
+  position: relative;
+  z-index: 1;
   display: block;
   max-width: 100%;
   max-height: 100%;
+  border-radius: 7px;
+  filter: drop-shadow(0 0 20px rgba(27, 216, 255, 0.08));
 }
 </style>

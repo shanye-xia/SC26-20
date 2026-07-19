@@ -40,15 +40,29 @@ export function drawBackground(state: CanvasState): void {
   const cssWidth = canvas.width / state.dpr
   const cssHeight = canvas.height / state.dpr
 
-  ctx.fillStyle = COLORS.bgCode
+  const gradient = ctx.createRadialGradient(
+    cssWidth * 0.52,
+    cssHeight * 0.48,
+    cssWidth * 0.08,
+    cssWidth * 0.52,
+    cssHeight * 0.48,
+    cssWidth * 0.72
+  )
+  gradient.addColorStop(0, '#0c2138')
+  gradient.addColorStop(0.52, COLORS.bgCode)
+  gradient.addColorStop(1, '#020814')
+  ctx.fillStyle = gradient
   ctx.fillRect(0, 0, cssWidth, cssHeight)
+
+  drawStarDust(ctx, cssWidth, cssHeight)
 }
 
 export function drawGrid(state: CanvasState): void {
   const { ctx, cellSize } = state
   const cssSize = cellSize * GRID_SIZE
 
-  ctx.strokeStyle = COLORS.gridLine
+  ctx.save()
+  ctx.strokeStyle = 'rgba(72, 122, 170, 0.26)'
   ctx.lineWidth = 1
   ctx.beginPath()
 
@@ -61,6 +75,26 @@ export function drawGrid(state: CanvasState): void {
   }
 
   ctx.stroke()
+
+  ctx.strokeStyle = 'rgba(32, 231, 255, 0.08)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(0.5, 0.5, cssSize - 1, cssSize - 1)
+  ctx.restore()
+}
+
+function drawStarDust(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  ctx.save()
+  for (let i = 0; i < 58; i++) {
+    const x = ((i * 97) % 1000) / 1000 * width
+    const y = ((i * 193) % 1000) / 1000 * height
+    const color = i % 5 === 0 ? COLORS.accentNode : i % 3 === 0 ? COLORS.accentString : COLORS.accentFunction
+    const alpha = i % 7 === 0 ? 0.55 : 0.28
+    const size = i % 11 === 0 ? 2 : 1
+
+    ctx.fillStyle = hexToRgba(color, alpha)
+    ctx.fillRect(x, y, size, size)
+  }
+  ctx.restore()
 }
 
 export function drawCell(
@@ -135,7 +169,9 @@ export function drawNode(
     drawCorrectNode(state, x, y, isCurrentTarget)
   }
 
-  ctx.fillStyle = isDistractor ? COLORS.textPrimary : COLORS.bgPrimary
+  ctx.fillStyle = isDistractor ? COLORS.textPrimary : '#fff2a8'
+  ctx.shadowColor = isDistractor ? COLORS.accentNode : COLORS.accentVariable
+  ctx.shadowBlur = isCurrentTarget ? 10 : 3
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
@@ -150,6 +186,7 @@ export function drawNode(
     x * cellSize + cellSize / 2,
     y * cellSize + cellSize / 2
   )
+  ctx.shadowBlur = 0
 }
 
 export function drawWall(state: CanvasState, x: number, y: number): void {
@@ -159,9 +196,12 @@ export function drawWall(state: CanvasState, x: number, y: number): void {
   const py = y * cellSize + gap
   const size = cellSize - gap * 2
 
+  ctx.save()
+  ctx.shadowColor = COLORS.wallStroke
+  ctx.shadowBlur = 10
   ctx.fillStyle = COLORS.wallFill
   ctx.strokeStyle = COLORS.wallStroke
-  ctx.lineWidth = 2
+  ctx.lineWidth = 1.5
   roundRect(ctx, px, py, size, size, 4)
   ctx.fill()
   ctx.stroke()
@@ -174,6 +214,7 @@ export function drawWall(state: CanvasState, x: number, y: number): void {
   ctx.moveTo(px + size * 0.55, py + size * 0.9)
   ctx.lineTo(px + size * 0.9, py + size * 0.55)
   ctx.stroke()
+  ctx.restore()
 }
 
 export function drawPowerUp(state: CanvasState, x: number, y: number, type: PowerUpType): void {
@@ -183,6 +224,9 @@ export function drawPowerUp(state: CanvasState, x: number, y: number, type: Powe
   const radius = cellSize * 0.34
   const color = getPowerUpColor(type)
 
+  ctx.save()
+  ctx.shadowColor = color
+  ctx.shadowBlur = 12
   ctx.fillStyle = color
   ctx.strokeStyle = COLORS.textPrimary
   ctx.lineWidth = 2
@@ -196,6 +240,7 @@ export function drawPowerUp(state: CanvasState, x: number, y: number, type: Powe
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(getPowerUpLabel(type), cx, cy)
+  ctx.restore()
 }
 
 export function drawProjectile(state: CanvasState, x: number, y: number): void {
@@ -203,6 +248,9 @@ export function drawProjectile(state: CanvasState, x: number, y: number): void {
   const cx = x * cellSize + cellSize / 2
   const cy = y * cellSize + cellSize / 2
 
+  ctx.save()
+  ctx.shadowColor = COLORS.projectile
+  ctx.shadowBlur = 12
   ctx.fillStyle = COLORS.projectile
   ctx.strokeStyle = COLORS.powerShot
   ctx.lineWidth = 2
@@ -210,42 +258,54 @@ export function drawProjectile(state: CanvasState, x: number, y: number): void {
   ctx.arc(cx, cy, Math.max(4, cellSize * 0.2), 0, Math.PI * 2)
   ctx.fill()
   ctx.stroke()
+  ctx.restore()
 }
 
 function drawCorrectNode(state: CanvasState, x: number, y: number, isCurrentTarget: boolean): void {
   const { ctx, cellSize } = state
-  const gap = 2
+  const gap = 3
   const px = x * cellSize + gap
   const py = y * cellSize + gap
   const size = cellSize - gap * 2
 
-  ctx.fillStyle = COLORS.accentString
-  roundRect(ctx, px, py, size, size, 4)
+  ctx.save()
+  ctx.shadowColor = isCurrentTarget ? COLORS.accentVariable : COLORS.accentString
+  ctx.shadowBlur = isCurrentTarget ? 22 : 13
+  ctx.fillStyle = isCurrentTarget ? 'rgba(255, 215, 90, 0.16)' : 'rgba(32, 246, 210, 0.18)'
+  ctx.strokeStyle = isCurrentTarget ? COLORS.accentVariable : COLORS.accentString
+  ctx.lineWidth = isCurrentTarget ? 2.4 : 1.6
+  roundRect(ctx, px, py, size, size, 6)
   ctx.fill()
+  ctx.stroke()
 
   if (isCurrentTarget) {
-    ctx.strokeStyle = COLORS.accentVariable
-    ctx.lineWidth = 2
-    roundRect(ctx, px - 1, py - 1, size + 2, size + 2, 5)
+    ctx.strokeStyle = 'rgba(255, 242, 168, 0.88)'
+    ctx.lineWidth = 1
+    roundRect(ctx, px + 4, py + 4, size - 8, size - 8, 4)
     ctx.stroke()
   }
+  ctx.restore()
 }
 
 function drawDistractorNode(state: CanvasState, x: number, y: number): void {
   const { ctx, cellSize } = state
-  const gap = 2
+  const gap = 4
   const px = x * cellSize + gap
   const py = y * cellSize + gap
   const size = cellSize - gap * 2
 
-  ctx.fillStyle = COLORS.bgPanel
-  ctx.setLineDash([4, 4])
-  ctx.strokeStyle = COLORS.border
-  ctx.lineWidth = 1
-  roundRect(ctx, px, py, size, size, 4)
+  ctx.save()
+  ctx.fillStyle = 'rgba(255, 102, 189, 0.08)'
+  ctx.setLineDash([6, 4])
+  ctx.strokeStyle = COLORS.accentNode
+  ctx.lineWidth = 1.4
+  ctx.shadowColor = COLORS.accentNode
+  ctx.shadowBlur = 9
+  roundRect(ctx, px, py, size, size, 6)
   ctx.fill()
   ctx.stroke()
   ctx.setLineDash([])
+  ctx.restore()
 }
 
 function fitTextFontSize(
@@ -271,16 +331,100 @@ export function drawSnake(
   headDirection: string,
   effects?: ActiveEffects
 ): void {
-  body.forEach((segment, index) => {
+  body.slice().reverse().forEach((segment, reverseIndex) => {
+    const index = body.length - 1 - reverseIndex
     const isHead = index === 0
-    const color = isHead ? lightenColor(COLORS.accentSnake, 20) : COLORS.accentSnake
-    drawRoundedCell(state, segment.x, segment.y, color, isHead ? 6 : 4, 2)
+    drawSnakeSegment(state, segment.x, segment.y, isHead, index, headDirection)
     drawSnakeEffect(state, segment.x, segment.y, effects)
 
     if (isHead) {
       drawEyes(state, segment.x, segment.y, headDirection, (effects?.shots ?? 0) > 0)
     }
   })
+}
+
+function drawSnakeSegment(
+  state: CanvasState,
+  x: number,
+  y: number,
+  isHead: boolean,
+  index: number,
+  headDirection: string
+): void {
+  const { ctx, cellSize } = state
+  const gap = 3
+  const px = x * cellSize + gap
+  const py = y * cellSize + gap
+  const size = cellSize - gap * 2
+  const alpha = Math.max(0.72, 1 - index * 0.045)
+
+  ctx.save()
+  ctx.shadowColor = COLORS.accentSnake
+  ctx.shadowBlur = isHead ? 20 : 14
+  const gradient = ctx.createLinearGradient(px, py, px + size, py + size)
+  gradient.addColorStop(0, hexToRgba('#6ff5ff', alpha))
+  gradient.addColorStop(0.55, hexToRgba(COLORS.accentSnake, alpha))
+  gradient.addColorStop(1, hexToRgba('#0aaee5', alpha))
+  ctx.fillStyle = gradient
+  ctx.strokeStyle = isHead ? '#6ff5ff' : 'rgba(111, 245, 255, 0.55)'
+  ctx.lineWidth = isHead ? 2 : 1.4
+
+  if (isHead) {
+    drawHeadShape(ctx, px, py, size, headDirection)
+  } else {
+    roundRect(ctx, px, py, size, size, 6)
+  }
+  ctx.fill()
+  ctx.stroke()
+
+  ctx.shadowBlur = 0
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.18)'
+  roundRect(ctx, px + size * 0.14, py + size * 0.12, size * 0.42, size * 0.12, 4)
+  ctx.fill()
+  ctx.restore()
+}
+
+function drawHeadShape(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  direction: string
+): void {
+  const angle = directionToAngle(direction)
+  const cx = x + size / 2
+  const cy = y + size / 2
+  const notch = size * 0.22
+  const r = Math.min(7, size * 0.18)
+
+  ctx.translate(cx, cy)
+  ctx.rotate(angle)
+  ctx.beginPath()
+  ctx.moveTo(-size / 2 + r, -size / 2)
+  ctx.lineTo(size / 2 - notch, -size / 2)
+  ctx.lineTo(size / 2, 0)
+  ctx.lineTo(size / 2 - notch, size / 2)
+  ctx.lineTo(-size / 2 + r, size / 2)
+  ctx.quadraticCurveTo(-size / 2, size / 2, -size / 2, size / 2 - r)
+  ctx.lineTo(-size / 2, -size / 2 + r)
+  ctx.quadraticCurveTo(-size / 2, -size / 2, -size / 2 + r, -size / 2)
+  ctx.closePath()
+  ctx.rotate(-angle)
+  ctx.translate(-cx, -cy)
+}
+
+function directionToAngle(direction: string): number {
+  switch (direction) {
+    case 'UP':
+      return -Math.PI / 2
+    case 'DOWN':
+      return Math.PI / 2
+    case 'LEFT':
+      return Math.PI
+    case 'RIGHT':
+    default:
+      return 0
+  }
 }
 
 function drawSnakeEffect(
@@ -463,15 +607,6 @@ export function drawErrorFlash(state: CanvasState): void {
 
   ctx.fillStyle = 'rgba(243, 139, 168, 0.3)'
   ctx.fillRect(0, 0, cssWidth, cssHeight)
-}
-
-function lightenColor(hex: string, percent: number): string {
-  const num = parseInt(hex.replace('#', ''), 16)
-  const amt = Math.round(2.55 * percent)
-  const R = Math.min(255, (num >> 16) + amt)
-  const G = Math.min(255, ((num >> 8) & 0x00ff) + amt)
-  const B = Math.min(255, (num & 0x0000ff) + amt)
-  return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`
 }
 
 function hexToRgba(hex: string, alpha: number): string {

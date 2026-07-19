@@ -1,7 +1,119 @@
 <template>
-  <n-card class="code-panel" title="关卡信息" size="small">
-    <section class="level-section">
-      <h3 class="section-title">关卡选择</h3>
+  <n-card class="code-panel" size="small">
+    <section class="panel-block hero-block">
+      <div class="level-summary">
+        <h2 class="level-title">{{ store.state.levelConfig?.title || 'Code Snake' }}</h2>
+        <p class="level-description">{{ store.state.levelConfig?.description || '按正确顺序吃掉代码节点' }}</p>
+      </div>
+      <div class="block-title">
+        <span>目标代码</span>
+      </div>
+      <pre class="target-code"><code v-html="renderedCode" /></pre>
+    </section>
+
+    <section class="panel-block">
+      <div class="block-title">
+        <span>当前进度</span>
+      </div>
+      <div
+        class="progress-steps"
+        :style="progressGridStyle"
+        aria-label="当前关卡进度"
+      >
+        <span
+          v-for="(item, index) in progressItems"
+          :key="index"
+          class="progress-item"
+          :class="{ lit: index < store.state.collectedCount, current: index === store.state.collectedCount }"
+        >
+          {{ item }}
+        </span>
+      </div>
+    </section>
+
+    <section class="panel-block next-target">
+      <div class="block-title gold">
+        <span>下一个节点</span>
+      </div>
+      <div class="target-card">
+        <span>{{ store.currentTargetLabel || '完成' }}</span>
+        <ChevronRight :size="34" />
+      </div>
+    </section>
+
+    <section class="stat-strip" aria-label="关卡统计">
+      <span><BarChart3 :size="16" /> 难度 {{ store.state.levelConfig?.difficulty ?? store.state.levelIndex }}</span>
+      <span><Target :size="16" /> 目标 {{ store.state.levelConfig?.correctOrder.length ?? 0 }}</span>
+      <span><KeyRound :size="16" /> 初始长度 {{ store.state.levelConfig?.initialSnakeLength ?? 3 }}</span>
+      <span><BrickWall :size="16" /> 墙壁 {{ store.state.obstacles.length }}</span>
+      <span><LockKeyhole :size="16" /> 已解锁 {{ store.state.maxUnlockedLevel }}/{{ store.availableLevels.length }}</span>
+    </section>
+
+    <section class="panel-block code-section">
+      <div class="block-title">
+        <span>当前代码</span>
+        <i />
+      </div>
+      <div class="editor-shell">
+        <span class="line-number">1</span>
+        <pre class="code-block"><code v-html="renderedCode" /></pre>
+      </div>
+
+      <div v-if="errorMessage" class="error-toast">
+        {{ errorMessage }}
+      </div>
+    </section>
+
+    <section class="panel-block mode-panel">
+      <div class="block-title">
+        <span>挑战模式</span>
+      </div>
+      <div class="mode-options">
+        <button
+          type="button"
+          class="mode-option"
+          :class="{ active: !store.state.hardMode }"
+          @click="store.setHardMode(false)"
+        >
+          <Gamepad2 :size="20" />
+          普通
+        </button>
+        <button
+          type="button"
+          class="mode-option"
+          :class="{ active: store.state.hardMode }"
+          @click="store.setHardMode(true)"
+        >
+          <Skull :size="20" />
+          专家
+        </button>
+      </div>
+    </section>
+
+    <section v-if="availablePowerUps.length" class="panel-block power-card">
+      <div class="block-title">
+        <span>{{ store.state.status === 'PAUSED' ? '本关提示' : '道具状态' }}</span>
+      </div>
+      <div class="power-list">
+        <span
+          v-for="powerUp in availablePowerUps"
+          :key="powerUp.type"
+          class="power-chip"
+        >
+          {{ powerUp.label }}：{{ powerUp.description }}
+        </span>
+      </div>
+      <div class="effect-row">
+        <span>护盾 {{ store.state.activeEffects.shield }}</span>
+        <span>无敌 {{ invincibleSeconds }}s</span>
+        <span>弹药 {{ store.state.activeEffects.shots }}</span>
+      </div>
+    </section>
+
+    <section class="panel-block level-section">
+      <div class="block-title">
+        <span>关卡选择</span>
+      </div>
       <div class="level-picker" aria-label="关卡选择">
         <n-button
           v-for="item in visibleLevels"
@@ -24,91 +136,22 @@
         </n-button>
       </div>
     </section>
-
-    <section class="level-section current-level">
-      <h2 class="level-title">{{ store.state.levelConfig?.title || 'Code Snake' }}</h2>
-      <p class="level-description">{{ store.state.levelConfig?.description || '按正确顺序吃掉代码节点' }}</p>
-
-      <div class="progress-card">
-        <div class="progress-header">
-          <span>当前关卡进度</span>
-          <strong>下一个：{{ store.currentTargetLabel || '完成' }}</strong>
-        </div>
-        <div
-          class="progress-steps"
-          :style="progressGridStyle"
-          aria-label="当前关卡进度"
-        >
-          <span
-            v-for="(item, index) in progressItems"
-            :key="index"
-            class="progress-item"
-            :class="{ lit: index < store.state.collectedCount, current: index === store.state.collectedCount }"
-          >
-            {{ item }}
-          </span>
-        </div>
-      </div>
-
-      <div class="level-stats">
-        <span>难度 {{ store.state.levelConfig?.difficulty ?? store.state.levelIndex }}</span>
-        <span>目标 {{ store.state.levelConfig?.correctOrder.length ?? 0 }}</span>
-        <span>初始长度 {{ store.state.levelConfig?.initialSnakeLength ?? 3 }}</span>
-        <span>墙壁 {{ store.state.obstacles.length }}</span>
-        <span>已解锁 {{ store.state.maxUnlockedLevel }}/{{ store.availableLevels.length }}</span>
-      </div>
-
-      <div class="mode-row">
-        <div>
-          <strong>困难模式</strong>
-          <span>正确节点不再额外标记</span>
-        </div>
-        <n-switch
-          :value="store.state.hardMode"
-          @update:value="store.setHardMode"
-        />
-      </div>
-
-      <div v-if="availablePowerUps.length" class="power-card">
-        <div class="power-header">
-          <strong>{{ store.state.status === 'PAUSED' ? '本关开始前提示' : '道具状态' }}</strong>
-          <span>空格发射攻击</span>
-        </div>
-        <div class="power-list">
-          <span
-            v-for="powerUp in availablePowerUps"
-            :key="powerUp.type"
-            class="power-chip"
-          >
-            {{ powerUp.label }}：{{ powerUp.description }}
-          </span>
-        </div>
-        <div class="effect-row">
-          <span>护盾 {{ store.state.activeEffects.shield }}</span>
-          <span>无敌 {{ invincibleSeconds }}s</span>
-          <span>弹药 {{ store.state.activeEffects.shots }}</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="code-section">
-      <h3 class="section-title">当前代码</h3>
-      <pre class="code-block"><code v-html="renderedCode" /></pre>
-
-      <div v-if="errorMessage" class="error-toast">
-        {{ errorMessage }}
-      </div>
-
-      <div class="target-hint">
-        下一个目标：<span class="target-label">{{ store.currentTargetLabel || '即将通关' }}</span>
-      </div>
-    </section>
   </n-card>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { NButton, NCard, NSwitch } from 'naive-ui'
+import { NButton, NCard } from 'naive-ui'
+import {
+  BarChart3,
+  BrickWall,
+  ChevronRight,
+  Gamepad2,
+  KeyRound,
+  LockKeyhole,
+  Skull,
+  Target
+} from 'lucide-vue-next'
 import { useGameStore } from '@/stores/gameStore'
 
 const store = useGameStore()
@@ -195,8 +238,11 @@ function escapeHtml(text: string): string {
 <style scoped>
 .code-panel {
   height: 100%;
-  background-color: var(--bg-panel);
+  background:
+    linear-gradient(145deg, rgba(7, 19, 36, 0.96), rgba(3, 10, 22, 0.94));
   color: var(--text-primary);
+  border: 1px solid var(--panel-border-soft);
+  box-shadow: var(--panel-glow);
 }
 
 .code-panel :deep(.n-card-header__main),
@@ -204,19 +250,88 @@ function escapeHtml(text: string): string {
   color: var(--text-primary);
 }
 
-.level-section,
-.code-section {
+.code-panel :deep(.n-card__content) {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  padding: 0;
 }
 
-.current-level {
-  margin-top: 16px;
+.panel-block {
+  position: relative;
+  padding: 16px 18px;
+  border: 1px solid var(--panel-border-soft);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(8, 22, 40, 0.88), rgba(4, 11, 23, 0.9));
+  box-shadow: inset 0 0 22px rgba(32, 200, 255, 0.07);
+  overflow: hidden;
 }
 
-.code-section {
-  margin-top: 16px;
+.panel-block::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 28px;
+  height: 28px;
+  border-top: 2px solid var(--neon-cyan);
+  border-left: 2px solid var(--neon-cyan);
+}
+
+.panel-block::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 28px;
+  height: 28px;
+  border-right: 2px solid rgba(32, 231, 255, 0.55);
+  border-bottom: 2px solid rgba(32, 231, 255, 0.55);
+}
+
+.hero-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.level-summary {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.block-title {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.block-title span {
+  text-shadow: 0 0 10px rgba(32, 231, 255, 0.22);
+}
+
+.block-title.gold {
+  color: var(--neon-gold);
+}
+
+.block-title i {
+  display: inline-flex;
+  width: 44px;
+  height: 10px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(32, 231, 255, 0.45) 0 34%, transparent 36%) 0 0 / 16px 10px repeat-x;
 }
 
 .level-title {
@@ -233,13 +348,15 @@ function escapeHtml(text: string): string {
 
 .level-picker {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .level-button {
   min-width: 0;
   font-family: "JetBrains Mono", "Fira Code", monospace;
+  background: rgba(4, 14, 29, 0.86);
+  border-color: rgba(85, 129, 181, 0.38);
 }
 
 .level-button :deep(.n-button__content) {
@@ -248,9 +365,10 @@ function escapeHtml(text: string): string {
 
 .level-button.active {
   color: var(--text-primary);
-  background-color: rgba(137, 180, 250, 0.28);
-  border-color: var(--accent-function);
+  background: rgba(32, 231, 255, 0.16);
+  border-color: var(--neon-cyan);
   font-weight: 700;
+  box-shadow: 0 0 14px rgba(32, 231, 255, 0.2);
 }
 
 .level-button.active :deep(.n-button__content) {
@@ -269,165 +387,164 @@ function escapeHtml(text: string): string {
   border-color: var(--accent-variable);
 }
 
-.level-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.level-stats span {
-  padding: 3px 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background-color: var(--bg-code);
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.mode-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background-color: var(--bg-code);
-}
-
-.mode-row div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.mode-row strong {
-  color: var(--text-primary);
-  font-size: 13px;
-}
-
-.mode-row span {
-  color: var(--text-secondary);
-  font-size: 12px;
-}
-
-.power-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background-color: var(--bg-code);
-}
-
-.power-header,
+.stat-strip,
 .effect-row,
 .power-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
-.power-header {
-  justify-content: space-between;
-  color: var(--text-secondary);
-  font-size: 12px;
+.stat-strip {
+  padding: 0;
 }
 
-.power-header strong {
-  color: var(--accent-variable);
-}
-
+.stat-strip span,
 .power-chip,
 .effect-row span {
-  padding: 3px 8px;
-  border-radius: 4px;
-  background-color: var(--bg-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 5px 9px;
+  border: 1px solid rgba(67, 122, 180, 0.38);
+  border-radius: 7px;
+  background: rgba(4, 14, 29, 0.84);
   color: var(--text-secondary);
   font-size: 12px;
 }
 
-.progress-card {
-  padding: 10px;
-  background-color: var(--bg-code);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-.progress-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.progress-header strong {
-  color: var(--accent-variable);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+.stat-strip svg {
+  color: var(--neon-cyan);
 }
 
 .progress-steps {
   display: grid;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background-color: var(--bg-primary);
+  position: relative;
+  z-index: 1;
+  gap: 10px;
 }
 
 .progress-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
-  min-height: 30px;
-  padding: 5px 6px;
+  min-height: 50px;
+  padding: 8px 10px;
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  background-color: var(--bg-primary);
+  background: rgba(4, 14, 29, 0.88);
+  border: 1px solid rgba(85, 129, 181, 0.58);
+  border-radius: 7px;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 20px;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  border-right: 1px solid var(--border);
-  transition: background-color 0.25s ease, color 0.25s ease;
-}
-
-.progress-item:last-child {
-  border-right: 0;
+  transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .progress-item.lit {
-  color: #000000;
-  background-color: var(--progress-lit-bg);
+  color: var(--accent-lit-text);
+  background: var(--progress-lit-bg);
+  border-color: var(--neon-green);
   font-weight: 700;
+  box-shadow: 0 0 14px rgba(30, 240, 189, 0.2);
 }
 
 .progress-item.current {
-  background-color: rgba(249, 226, 175, 0.16);
-  color: var(--accent-variable);
-  box-shadow: inset 0 0 0 1px var(--accent-variable);
+  background: rgba(255, 215, 90, 0.13);
+  border-color: var(--neon-gold);
+  color: var(--neon-gold);
+  box-shadow: var(--gold-glow);
   font-weight: 700;
 }
 
-.section-title {
+.next-target {
+  border-color: rgba(255, 215, 90, 0.68);
+  box-shadow: var(--gold-glow);
+}
+
+.next-target::before,
+.next-target::after {
+  border-color: var(--neon-gold);
+}
+
+.target-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 54px;
+  padding: 10px 16px;
+  border: 1px solid var(--neon-gold);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 215, 90, 0.12), rgba(255, 215, 90, 0.04)),
+    radial-gradient(circle at 50% 55%, rgba(255, 215, 90, 0.16), transparent 48%);
+  color: var(--neon-gold);
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 24px;
+  font-weight: 800;
+  text-shadow: 0 0 14px rgba(255, 215, 90, 0.5);
+}
+
+.target-card svg {
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 90, 0.7));
+}
+
+.target-code {
+  position: relative;
+  z-index: 1;
   margin: 0;
-  font-size: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(85, 129, 181, 0.45);
+  border-radius: 8px;
+  background: rgba(4, 14, 29, 0.82);
   color: var(--text-primary);
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 20px;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre;
 }
 
 .code-block {
   margin: 0;
-  padding: 16px;
-  background-color: var(--bg-code);
-  border-radius: 8px;
+  padding: 16px 18px;
+  flex: 1;
   font-family: "JetBrains Mono", "Fira Code", monospace;
-  font-size: var(--code-font-size);
+  font-size: 21px;
   line-height: 1.6;
   color: var(--text-primary);
   overflow-x: auto;
   white-space: pre;
+}
+
+.editor-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  min-height: 112px;
+  border: 1px solid rgba(85, 129, 181, 0.45);
+  border-radius: 8px;
+  background: rgba(4, 14, 29, 0.84);
+  overflow: hidden;
+}
+
+.line-number {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 17px;
+  border-right: 1px solid rgba(85, 129, 181, 0.45);
+  color: #7088aa;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 20px;
 }
 
 .code-segment {
@@ -438,22 +555,21 @@ function escapeHtml(text: string): string {
 
 .code-segment.lit {
   color: var(--accent-lit-text) !important;
-  background-color: var(--accent-lit-bg) !important;
+  background-color: transparent !important;
   font-weight: 700;
   opacity: 1;
-  border-radius: 4px;
-  padding: 2px 6px;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  text-shadow: 0 0 10px rgba(255, 215, 90, 0.35);
 }
 
 .code-segment.dim {
   color: var(--text-secondary);
-  opacity: 0.5;
+  opacity: 0.72;
 }
 
 .error-toast {
-  margin-top: 12px;
-  padding: 10px 12px;
+  position: relative;
+  z-index: 1;
+  padding: 11px 12px;
   background-color: rgba(243, 139, 168, 0.2);
   border-left: 3px solid var(--accent-error);
   border-radius: 4px;
@@ -461,15 +577,68 @@ function escapeHtml(text: string): string {
   font-size: 13px;
 }
 
-.target-hint {
-  margin-top: 12px;
-  font-size: 13px;
-  color: var(--text-secondary);
+.mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
-.target-label {
-  margin-left: 6px;
-  color: var(--accent-variable);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+.mode-option {
+  min-width: 0;
+  min-height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(85, 129, 181, 0.55);
+  border-radius: 8px;
+  background: rgba(4, 14, 29, 0.86);
+  color: var(--text-secondary);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.mode-option.active {
+  border-color: var(--neon-cyan);
+  background: rgba(32, 231, 255, 0.14);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 18px rgba(32, 231, 255, 0.18);
+}
+
+.mode-option:not(.active):hover {
+  border-color: rgba(32, 231, 255, 0.42);
+  color: var(--text-primary);
+}
+
+.power-card {
+  gap: 10px;
+}
+
+@media (max-width: 1100px) {
+  .level-picker {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .target-card {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .code-panel :deep(.n-card__content) {
+    padding: 0;
+  }
+
+  .target-card {
+    min-height: 48px;
+    font-size: 20px;
+  }
+
+  .progress-item {
+    min-height: 42px;
+    font-size: 15px;
+  }
 }
 </style>

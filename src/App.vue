@@ -33,21 +33,23 @@ const isDev = import.meta.env.DEV
 
 const themeOverrides = {
   common: {
-    primaryColor: '#89b4fa',
-    primaryColorHover: '#b4befe',
-    primaryColorPressed: '#74c7ec'
+    primaryColor: '#20e7ff',
+    primaryColorHover: '#68f3ff',
+    primaryColorPressed: '#00b7db'
   },
   Card: {
-    color: '#2a2a3c',
-    textColor: '#cdd6f4',
-    borderColor: '#45475a'
+    color: 'rgba(8, 18, 34, 0.86)',
+    textColor: '#e6f7ff',
+    borderColor: 'rgba(32, 200, 255, 0.38)',
+    borderRadius: '8px'
   },
   Modal: {
-    color: '#2a2a3c',
-    textColor: '#cdd6f4'
+    color: 'rgba(8, 18, 34, 0.96)',
+    textColor: '#e6f7ff'
   },
   Button: {
-    textColor: '#cdd6f4'
+    textColor: '#e6f7ff',
+    borderRadiusSmall: '6px'
   }
 }
 
@@ -58,7 +60,8 @@ onMounted(() => {
 
 <style scoped>
 .app {
-  max-width: 1200px;
+  position: relative;
+  max-width: 1680px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -66,12 +69,25 @@ onMounted(() => {
   min-height: calc(100vh - 32px);
 }
 
+.app::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(32, 200, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(32, 200, 255, 0.045) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at 50% 45%, black, transparent 78%);
+}
+
 .main-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(560px, 1.48fr) minmax(360px, 0.94fr);
   gap: 16px;
   flex: 1;
   min-height: 0;
+  align-items: start;
 }
 
 .game-board {

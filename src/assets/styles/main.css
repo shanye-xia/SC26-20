@@ -1,25 +1,33 @@
 :root {
-  --bg-primary: #1e1e2e;
-  --bg-panel: #2a2a3c;
-  --bg-code: #1a1b26;
-  --grid-line: #3b3d52;
-  --text-primary: #cdd6f4;
-  --text-secondary: #a6adc8;
+  --bg-primary: #030813;
+  --bg-panel: rgba(8, 18, 34, 0.86);
+  --bg-code: #071120;
+  --grid-line: rgba(69, 119, 168, 0.24);
+  --text-primary: #e6f7ff;
+  --text-secondary: #8aa4c3;
   --accent-keyword: #f38ba8;
-  --accent-variable: #f9e2af;
-  --accent-string: #a6e3a1;
-  --accent-lit-bg: #007f3d;
-  --accent-lit-text: #000000;
-  --progress-lit-bg: rgba(0,127,61,0.9);
+  --accent-variable: #ffd75a;
+  --accent-string: #20f6d2;
+  --accent-lit-bg: rgba(0, 217, 178, 0.22);
+  --accent-lit-text: #fff2a8;
+  --progress-lit-bg: rgba(0, 217, 178, 0.24);
   --code-font-size: 15px;
-  --rules-bg: rgba(250, 204, 21, 0.08);
-  --rules-accent: #f6c84c;
-  --accent-function: #89b4fa;
-  --accent-error: #f38ba8;
-  --accent-health: #f7768e;
-  --accent-snake: #89dceb;
-  --accent-node: #b4befe;
-  --border: #45475a;
+  --rules-bg: rgba(255, 213, 74, 0.08);
+  --rules-accent: #ffd75a;
+  --accent-function: #20c8ff;
+  --accent-error: #ff5d8f;
+  --accent-health: #ff6f88;
+  --accent-snake: #1bd8ff;
+  --accent-node: #b36bff;
+  --border: rgba(67, 122, 180, 0.5);
+  --panel-border: rgba(32, 200, 255, 0.48);
+  --panel-border-soft: rgba(85, 129, 181, 0.38);
+  --panel-glow: 0 0 18px rgba(32, 200, 255, 0.12), inset 0 0 28px rgba(19, 95, 154, 0.14);
+  --gold-glow: 0 0 18px rgba(255, 215, 90, 0.25), inset 0 0 24px rgba(255, 215, 90, 0.08);
+  --neon-cyan: #20e7ff;
+  --neon-green: #1ef0bd;
+  --neon-gold: #ffd75a;
+  --neon-pink: #ff66bd;
 
   font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   line-height: 1.5;
@@ -43,12 +51,20 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--bg-primary);
+  background:
+    radial-gradient(circle at 78% 18%, rgba(32, 200, 255, 0.15), transparent 28%),
+    radial-gradient(circle at 22% 82%, rgba(255, 102, 189, 0.1), transparent 30%),
+    linear-gradient(135deg, #020712 0%, #061224 48%, #020711 100%);
+  overflow-x: hidden;
 }
 
 #app {
   width: 100%;
   padding: 16px;
+}
+
+.n-card {
+  border-radius: 8px;
 }
 
 @media (prefers-reduced-motion: reduce) {
