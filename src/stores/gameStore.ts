@@ -36,7 +36,7 @@ import {
 import { getNodeAt, generateNodes, isCorrectNode } from '@/utils/nodes'
 import { generateObstacles, getRandomEmptyPosition, isOutOfBounds, isSelfCollision, positionInList, positionsEqual } from '@/utils/grid'
 import { loadLevel } from '@/utils/levelLoader'
-import { createSnake, moveSnake, canChangeDirection } from '@/utils/snake'
+import { createSnake, moveSnake, canChangeDirection, getNextHead } from '@/utils/snake'
 
 const CENTER: Position = {
   x: Math.floor(GRID_SIZE / 2),
@@ -152,18 +152,20 @@ export const useGameStore = defineStore('game', () => {
     state.activeEffects.invincibleMs = Math.max(0, state.activeEffects.invincibleMs - state.speed)
     moveProjectiles()
 
+    const nextHead = getNextHead(state.snake)
+    if (isOutOfBounds(nextHead) || positionInList(state.obstacles, nextHead)) {
+      handleBlockedMove()
+      return { ateNode: false, isCorrect: false, node: null }
+    }
+
     const growBy = state.growCounter > 0 ? 1 : 0
+    state.snake = moveSnake(state.snake, growBy)
     if (state.growCounter > 0) {
       state.growCounter--
     }
-
-    state.snake = moveSnake(state.snake, growBy)
     const head = state.snake.body[0]
 
-    if (isOutOfBounds(head) || isSelfCollision(state.snake, head) || positionInList(state.obstacles, head)) {
-      if (consumeProtection()) {
-        return { ateNode: false, isCorrect: false, node: null }
-      }
+    if (isSelfCollision(state.snake, head)) {
       state.status = 'LEVEL_FAILED'
       return { ateNode: false, isCorrect: false, node: null }
     }
@@ -437,6 +439,20 @@ export const useGameStore = defineStore('game', () => {
       return true
     }
     return false
+  }
+
+  function handleBlockedMove(): void {
+    if (consumeProtection()) return
+
+    state.lives--
+    state.errorFlash = true
+    setTimeout(() => {
+      state.errorFlash = false
+    }, GAME_CONSTANTS.errorFlashDuration)
+
+    if (state.lives <= 0) {
+      state.status = 'LEVEL_FAILED'
+    }
   }
 
   function getPowerUpAt(position: Position): PowerUp | undefined {
